@@ -118,6 +118,7 @@
                     method: "PUT",
                     headers: {
                         "Content-Type": "application/json",
+                        "X-Bin-Private": "false"
                         "X-Master-Key": API_KEY
                     },
                     body: JSON.stringify({ logs: currentLogs })
