@@ -3,13 +3,13 @@
 <head>
     <!-- ⚠️ REPLACE THE TWO STRINGS BELOW -->
     <script>
-    const API_KEY = "$2a$10$6sdqD84mGOrtV0iQCoqEiuwm6NLY/wQMAh7VUfRzQNiF13gTLRTaO"; 
-    const BIN_ID = "69f6f96c36566621a81c61f4";   
+        const API_KEY = "$2a$10$6sdqD84mGOrtV0iQCoqEiuwm6NLY/wQMAh7VUfRzQNiF13gTLRTaO"; 
+        const BIN_ID = "69f6f96c36566621a81c61f4";   
     </script>
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cloud Daily Time Record</title>
+    <title>Daily Time Record</title>
     <style>
         :root {
             --primary: #2563eb;
@@ -190,7 +190,6 @@
 </div>
 
 <script>
-    // 1. Live Ticking Clock
     function updateClock() {
         const now = new Date();
         const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -204,19 +203,13 @@
 
     document.addEventListener('DOMContentLoaded', fetchLogs);
 
-    // 2. Fetch and Render Logs
-        async function fetchLogs() {
-        const url = "https://jsonbin.io" + BIN_ID + "/latest";
+    async function fetchLogs() {
+        const url = "https://api.jsonbin.io/v3/b/" + BIN_ID + "/latest";
         try {
             const response = await fetch(url, {
                 method: "GET",
                 headers: { "X-Master-Key": API_KEY }
             });
-            
-            if (!response.ok) {
-                throw new Error("Cloud rejected fetch.");
-            }
-            
             const data = await response.json();
             
             if (data.record && data.record.logs) {
@@ -230,8 +223,6 @@
         }
     }
 
-
-    // 3. Log Logic (Solves the split issue & calculates hours)
     async function logTime(type) {
         const empName = document.getElementById('emp-name').value.trim();
         
@@ -244,7 +235,7 @@
         const dateStr = now.toLocaleDateString();
         const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
-        const url = "https://jsonbin.io" + BIN_ID;
+        const url = "https://api.jsonbin.io/v3/b/" + BIN_ID;
 
         try {
             const getResponse = await fetch(url + "/latest", {
@@ -258,7 +249,7 @@
                 currentLogs = getData.record.logs;
             }
 
-            // Find if this employee already has an open log for TODAY
+            // Find if this employee has an existing row TODAY
             let existingIndex = currentLogs.findIndex(log => log.employee === empName && log.date === dateStr);
 
             if (type === 'IN') {
@@ -271,33 +262,41 @@
                     employee: empName, 
                     date: dateStr, 
                     timeIn: timeStr, 
-                    timeInRaw: now.toISOString(), // Used for math
+                    timeInRaw: now.toISOString(), 
                     timeOut: null, 
                     hours: '--' 
                 };
                 currentLogs.unshift(newEntry);
             } 
             else if (type === 'OUT') {
-                if (existingIndex === -1 || !currentLogs[existingIndex].timeIn) {
-                    alert("You need to clock IN before you can clock OUT!");
-                    return;
-                }
-                if (currentLogs[existingIndex].timeOut) {
-                    alert("You have already clocked out for today!");
-                    return;
-                }
+                // FALLBACK: If employee clicked OUT without an IN, create a standalone OUT row!
+                if (existingIndex === -1) {
+                    const newEntry = { 
+                        employee: empName, 
+                        date: dateStr, 
+                        timeIn: null, 
+                        timeInRaw: null, 
+                        timeOut: timeStr, 
+                        hours: '--' 
+                    };
+                    currentLogs.unshift(newEntry);
+                } else {
+                    if (currentLogs[existingIndex].timeOut) {
+                        alert("You have already clocked out for today!");
+                        return;
+                    }
 
-                // Update existing row with Clock Out and do the math
-                currentLogs[existingIndex].timeOut = timeStr;
-                
-                const timeInObj = new Date(currentLogs[existingIndex].timeInRaw);
-                const diffMs = now - timeInObj; // Difference in milliseconds
-                const diffHrs = diffMs / (1000 * 60 * 60); // Convert to hours
-                
-                currentLogs[existingIndex].hours = diffHrs.toFixed(2) + " hrs";
+                    currentLogs[existingIndex].timeOut = timeStr;
+                    
+                    if (currentLogs[existingIndex].timeInRaw) {
+                        const timeInObj = new Date(currentLogs[existingIndex].timeInRaw);
+                        const diffMs = now - timeInObj;
+                        const diffHrs = diffMs / (1000 * 60 * 60);
+                        currentLogs[existingIndex].hours = diffHrs.toFixed(2) + " hrs";
+                    }
+                }
             }
 
-            // Save back to cloud
             const updateResponse = await fetch(url, {
                 method: "PUT",
                 headers: {
@@ -307,17 +306,17 @@
                 body: JSON.stringify({ logs: currentLogs })
             });
 
-            if (!updateResponse.ok) throw new Error("Cloud rejected update.");
+            if (!updateResponse.ok) throw new Error("Cloud rejected the update.");
 
             displayLogs(currentLogs);
             alert(`Successfully clocked ${type}!`);
         } catch (error) {
             console.error("Error saving log:", error);
-            alert("Failed to connect. Please check your keys!");
+            // This is the fallback alert if the API credentials themselves fail.
+            alert("Connection error! Please check that your Master Key and Bin ID are mapped properly.");
         }
     }
 
-    // 4. Draw Modern Table
     function displayLogs(logs) {
         const logTable = document.getElementById('dtr-log');
         if (!logTable) return;
