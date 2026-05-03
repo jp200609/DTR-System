@@ -9,19 +9,18 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Daily Time Record</title>
+    <title>Daily Time Record</title>
     <style>
         :root {
-            --primary: #dc2626;
-            --primary-hover: #b91c1c;
-            --bg: #fef2f2;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f1f5f9;
             --card: #ffffff;
-            --text: #1e1b4b;
-            --text-secondary: #7f1d1d;
-            --border: #fecaca;
-            --success: #16a34a;
+            --text: #0f172a;
+            --text-secondary: #475569;
+            --border: #e2e8f0;
+            --success: #10b981;
             --danger: #ef4444;
-            --warning: #ea580c;
         }
         body {
             font-family: system-ui, -apple-system, sans-serif;
@@ -37,12 +36,11 @@
         }
         .container {
             width: 100%;
-            max-width: 950px;
+            max-width: 800px;
             background: var(--card);
             padding: 32px;
             border-radius: 16px;
-            box-shadow: 0 10px 25px -5px rgba(220, 38, 38, 0.1), 0 8px 10px -6px rgba(220, 38, 38, 0.05);
-            border: 1px solid var(--border);
+            box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
         }
         .header {
             text-align: center;
@@ -57,8 +55,8 @@
         #clock {
             font-size: 20px;
             font-weight: 700;
-            color: var(--primary);
-            background: #fff5f5;
+            color: var(--text-secondary);
+            background: #f8fafc;
             padding: 8px 16px;
             border-radius: 8px;
             display: inline-block;
@@ -81,12 +79,11 @@
             font-size: 16px;
             box-sizing: border-box;
             transition: border-color 0.2s;
-            background-color: #fffafb;
         }
         input:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
         .controls {
             display: grid;
@@ -107,12 +104,12 @@
             align-items: center;
             gap: 8px;
         }
-        button:hover { transform: translateY(-1px); box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.15); }
+        button:hover { transform: translateY(-1px); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
         button:active { transform: translateY(0); }
         .btn-in { background-color: var(--success); color: white; }
-        .btn-in:hover { background-color: #15803d; }
+        .btn-in:hover { background-color: #059669; }
         .btn-out { background-color: var(--danger); color: white; }
-        .btn-out:hover { background-color: var(--primary-hover); }
+        .btn-out:hover { background-color: #dc2626; }
         
         .table-wrapper {
             overflow-x: auto;
@@ -123,41 +120,31 @@
             width: 100%;
             border-collapse: collapse;
             text-align: left;
-            font-size: 13px;
+            font-size: 14px;
             background: white;
         }
         th, td {
-            padding: 12px 14px;
+            padding: 14px;
             border-bottom: 1px solid var(--border);
         }
         th { 
-            background-color: #fff5f5; 
+            background-color: #f8fafc; 
             font-weight: 700;
             color: var(--text-secondary);
         }
         tr:last-child td { border-bottom: none; }
-        tr:hover { background-color: #fffafb; }
+        tr:hover { background-color: #f8fafc; }
         
         .status-badge {
             display: inline-block;
             padding: 4px 8px;
             border-radius: 6px;
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 700;
         }
         .status-in { background-color: #d1fae5; color: #065f46; }
         .status-out { background-color: #fee2e2; color: #991b1b; }
         
-        .metric-badge {
-            font-weight: 700;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 12px;
-        }
-        .positive { background-color: #d1fae5; color: #065f46; }
-        .negative { background-color: #fee2e2; color: #991b1b; }
-        .neutral { background-color: #f1f5f9; color: #475569; }
-
         #loading-text {
             text-align: center;
             color: var(--text-secondary);
@@ -170,12 +157,12 @@
 
 <div class="container">
     <div class="header">
-        <h2>STUDENT DAILY TIME RECORD</h2>
+        <h2>DAILY TIME RECORD</h2>
         <div id="clock">Loading Time...</div>
     </div>
     
     <div class="form-group">
-        <label for="emp-name">Student Name or ID</label>
+        <label for="emp-name">Employee Name or ID</label>
         <input type="text" id="emp-name" placeholder="Enter your name or ID number">
     </div>
     
@@ -188,28 +175,21 @@
         <table>
             <thead>
                 <tr>
-                    <th>Student</th>
+                    <th>Employee</th>
                     <th>Date</th>
                     <th>Time In</th>
                     <th>Time Out</th>
-                    <th>Total Hours</th>
-                    <th>Late (Mins)</th>
-                    <th>Undertime</th>
-                    <th>Overtime</th>
+                    <th>Hours Worked</th>
                 </tr>
             </thead>
             <tbody id="dtr-log">
-                <tr><td colspan="8" id="loading-text">Connecting to cloud storage...</td></tr>
+                <tr><td colspan="5" id="loading-text">Connecting to cloud storage...</td></tr>
             </tbody>
         </table>
     </div>
 </div>
 
 <script>
-    const SCHEDULE_IN_HOUR = 8;  // 8:00 AM
-    const SCHEDULE_OUT_HOUR = 17; // 5:00 PM
-    const WORK_HOURS_REQUIRED = 8; 
-
     function updateClock() {
         const now = new Date();
         const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -224,7 +204,7 @@
     document.addEventListener('DOMContentLoaded', fetchLogs);
 
     async function fetchLogs() {
-        const url = "https://jsonbin.io" + BIN_ID + "/latest";
+        const url = "https://api.jsonbin.io/v3/b/" + BIN_ID + "/latest";
         try {
             const response = await fetch(url, {
                 method: "GET",
@@ -247,7 +227,7 @@
         const empName = document.getElementById('emp-name').value.trim();
         
         if (!empName) {
-            alert("Please enter your Student Name or ID first!");
+            alert("Please enter your Employee Name or ID first!");
             return;
         }
 
@@ -255,7 +235,7 @@
         const dateStr = now.toLocaleDateString();
         const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
-        const url = "https://jsonbin.io" + BIN_ID;
+        const url = "https://api.jsonbin.io/v3/b/" + BIN_ID;
 
         try {
             const getResponse = await fetch(url + "/latest", {
@@ -269,6 +249,7 @@
                 currentLogs = getData.record.logs;
             }
 
+            // Find if this employee has an existing row TODAY
             let existingIndex = currentLogs.findIndex(log => log.employee === empName && log.date === dateStr);
 
             if (type === 'IN') {
@@ -277,62 +258,43 @@
                     return;
                 }
                 
-                let lateMinutes = 0;
-                const scheduleIn = new Date(now);
-                scheduleIn.setHours(SCHEDULE_IN_HOUR, 0, 0, 0);
-                
-                if (now > scheduleIn) {
-                    const diffMs = now - scheduleIn;
-                    lateMinutes = Math.floor(diffMs / (1000 * 60));
-                }
-
                 const newEntry = { 
                     employee: empName, 
                     date: dateStr, 
                     timeIn: timeStr, 
                     timeInRaw: now.toISOString(), 
                     timeOut: null, 
-                    hours: '--',
-                    late: lateMinutes,
-                    undertime: '--',
-                    overtime: '--'
+                    hours: '--' 
                 };
                 currentLogs.unshift(newEntry);
             } 
             else if (type === 'OUT') {
+                // FALLBACK: If employee clicked OUT without an IN, create a standalone OUT row!
                 if (existingIndex === -1) {
-                    alert("No Clock In record found for today. Please clock in first!");
-                    return;
-                }
-                if (currentLogs[existingIndex].timeOut) {
-                    alert("You have already clocked out for today!");
-                    return;
-                }
+                    const newEntry = { 
+                        employee: empName, 
+                        date: dateStr, 
+                        timeIn: null, 
+                        timeInRaw: null, 
+                        timeOut: timeStr, 
+                        hours: '--' 
+                    };
+                    currentLogs.unshift(newEntry);
+                } else {
+                    if (currentLogs[existingIndex].timeOut) {
+                        alert("You have already clocked out for today!");
+                        return;
+                    }
 
-                currentLogs[existingIndex].timeOut = timeStr;
-                
-                const timeInObj = new Date(currentLogs[existingIndex].timeInRaw);
-                const diffMs = now - timeInObj;
-                const totalHours = diffMs / (1000 * 60 * 60);
-                
-                const activeHours = totalHours > 5 ? totalHours - 1 : totalHours;
-                currentLogs[existingIndex].hours = activeHours.toFixed(2) + " hrs";
-
-                let undertimeStr = "0.00 hrs";
-                const scheduleOut = new Date(now);
-                scheduleOut.setHours(SCHEDULE_OUT_HOUR, 0, 0, 0);
-
-                if (now < scheduleOut) {
-                    const underMs = scheduleOut - now;
-                    undertimeStr = (underMs / (1000 * 60 * 60)).toFixed(2) + " hrs";
+                    currentLogs[existingIndex].timeOut = timeStr;
+                    
+                    if (currentLogs[existingIndex].timeInRaw) {
+                        const timeInObj = new Date(currentLogs[existingIndex].timeInRaw);
+                        const diffMs = now - timeInObj;
+                        const diffHrs = diffMs / (1000 * 60 * 60);
+                        currentLogs[existingIndex].hours = diffHrs.toFixed(2) + " hrs";
+                    }
                 }
-                currentLogs[existingIndex].undertime = undertimeStr;
-
-                let overtimeStr = "0.00 hrs";
-                if (activeHours > WORK_HOURS_REQUIRED) {
-                    overtimeStr = (activeHours - WORK_HOURS_REQUIRED).toFixed(2) + " hrs";
-                }
-                currentLogs[existingIndex].overtime = overtimeStr;
             }
 
             const updateResponse = await fetch(url, {
@@ -350,7 +312,8 @@
             alert(`Successfully clocked ${type}!`);
         } catch (error) {
             console.error("Error saving log:", error);
-            alert("Connection error! Please make sure your Master Key and Bin ID are mapped properly.");
+            // This is the fallback alert if the API credentials themselves fail.
+            alert("Connection error! Please check that your Master Key and Bin ID are mapped properly.");
         }
     }
 
@@ -360,24 +323,17 @@
         logTable.innerHTML = '';
         
         if (logs.length === 0) {
-            logTable.innerHTML = '<tr><td colspan="8" style="text-align:center;">No logs recorded yet.</td></tr>';
+            logTable.innerHTML = '<tr><td colspan="5" style="text-align:center;">No logs recorded yet.</td></tr>';
             return;
         }
         
         logs.forEach(log => {
-            const isLate = parseInt(log.late) > 0;
-            const hasUndertime = parseFloat(log.undertime) > 0;
-            const hasOvertime = parseFloat(log.overtime) > 0;
-
             const row = `<tr>
                 <td style="font-weight:600;">${log.employee || 'N/A'}</td>
                 <td>${log.date || ''}</td>
                 <td>${log.timeIn ? `<span class="status-badge status-in">IN</span> ${log.timeIn}` : '--'}</td>
                 <td>${log.timeOut ? `<span class="status-badge status-out">OUT</span> ${log.timeOut}` : '--'}</td>
                 <td style="font-weight:bold; color:var(--primary);">${log.hours || '--'}</td>
-                <td><span class="metric-badge ${isLate ? 'negative' : 'neutral'}">${log.late || 0}m</span></td>
-                <td><span class="metric-badge ${hasUndertime ? 'negative' : 'neutral'}">${log.undertime || '--'}</span></td>
-                <td><span class="metric-badge ${hasOvertime ? 'positive' : 'neutral'}">${log.overtime || '--'}</span></td>
             </tr>`;
             logTable.innerHTML += row;
         });
@@ -386,5 +342,4 @@
 
 </body>
 </html>
-
 
