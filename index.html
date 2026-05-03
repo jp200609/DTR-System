@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shared Cloud DTR</title>
+    <title>Daily Time Record</title>
     <style>
         :root {
             --primary: #2563eb;
@@ -75,7 +75,7 @@
         const API_KEY = "$2a$10$6sdqD84mGOrtV0iQCoqEiuwm6NLY/wQMAh7VUfRzQNiF13gTLRTaO";
         const BIN_ID = "69f6f08caaba88219766176c";
 
-        // Read logs on startup
+        // Pull logs from cloud on startup
         document.addEventListener('DOMContentLoaded', fetchLogs);
 
         async function fetchLogs() {
@@ -110,15 +110,15 @@
                     currentLogs = getData.record.logs;
                 }
 
-                // 2. Add new log to the top
+                // 2. Add new log to top
                 currentLogs.unshift(newEntry);
 
-                // 3. Save it back to the cloud
+                // 3. Save back to cloud
                 const updateResponse = await fetch(`https://jsonbin.io{BIN_ID}`, {
                     method: "PUT",
                     headers: {
                         "Content-Type": "application/json",
-                        "X-Master-Key": API_KEY
+                        "X-Master-Key": API_KEY,
                         "X-Bin-Private": "false"
                     },
                     body: JSON.stringify({ logs: currentLogs })
@@ -184,5 +184,4 @@
 
 </body>
 </html>
-
 
