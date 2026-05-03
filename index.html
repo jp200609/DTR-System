@@ -1,344 +1,468 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- ⚠️ REPLACE THE TWO STRINGS BELOW -->
-    <script>
-        const API_KEY = "$2a$10$6sdqD84mGOrtV0iQCoqEiuwm6NLY/wQMAh7VUfRzQNiF13gTLRTaO"; 
-        const BIN_ID = "69f6f96c36566621a81c61f4";   
-    </script>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daily Time Record</title>
+    <title>Coronacion's Student Daily Time Record</title>
     <style>
         :root {
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
-            --bg: #f1f5f9;
-            --card: #ffffff;
-            --text: #0f172a;
-            --text-secondary: #475569;
-            --border: #e2e8f0;
-            --success: #10b981;
-            --danger: #ef4444;
+            --bg-color: #fff5f5;
+            --primary-color: #ff6b6b;
+            --secondary-color: #ffe3e3;
+            --dark-red: #c92a2a;
+            --text-color: #2b2b2b;
+            --border-color: #ffc9c9;
         }
+
         body {
-            font-family: system-ui, -apple-system, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             margin: 0;
             padding: 20px;
             display: flex;
             justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            box-sizing: border-box;
         }
+
         .container {
             width: 100%;
-            max-width: 800px;
-            background: var(--card);
-            padding: 32px;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            max-width: 1000px;
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.1);
+            border: 1px solid var(--border-color);
         }
-        .header {
+
+        h1, h2 {
+            color: var(--dark-red);
             text-align: center;
-            margin-bottom: 24px;
+            margin-top: 0;
         }
-        h2 {
-            margin: 0 0 8px 0;
-            color: var(--primary);
-            font-size: 28px;
-            font-weight: 800;
-        }
-        #clock {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--text-secondary);
-            background: #f8fafc;
-            padding: 8px 16px;
+
+        .clock-section {
+            text-align: center;
+            padding: 20px;
+            background-color: var(--secondary-color);
             border-radius: 8px;
-            display: inline-block;
-            border: 1px solid var(--border);
+            margin-bottom: 25px;
         }
-        .form-group {
-            margin-bottom: 20px;
+
+        #current-time {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--dark-red);
+            margin: 10px 0;
         }
-        label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: 600;
-            color: var(--text-secondary);
+
+        #current-date {
+            font-size: 1.1rem;
+            color: #721c24;
         }
-        input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 16px;
-            box-sizing: border-box;
-            transition: border-color 0.2s;
-        }
-        input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-        .controls {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin-bottom: 32px;
-        }
-        button {
-            padding: 14px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.2s;
+
+        .inputs-section {
             display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: center;
             justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .inputs-section div {
+            display: flex;
             align-items: center;
             gap: 8px;
         }
-        button:hover { transform: translateY(-1px); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
-        button:active { transform: translateY(0); }
-        .btn-in { background-color: var(--success); color: white; }
-        .btn-in:hover { background-color: #059669; }
-        .btn-out { background-color: var(--danger); color: white; }
-        .btn-out:hover { background-color: #dc2626; }
-        
-        .table-wrapper {
-            overflow-x: auto;
-            border-radius: 8px;
-            border: 1px solid var(--border);
+
+        .inputs-section input {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            width: 200px;
         }
+
+        .actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--dark-red);
+        }
+
+        .status-banner {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .status-in { background-color: #d4edda; color: #155724; }
+        .status-out { background-color: #f8d7da; color: #721c24; }
+        .status-error { background-color: #ffccd5; color: #b00020; border: 1px solid #ff4d6d; }
+
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 30px;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
-            text-align: left;
-            font-size: 14px;
+            margin-top: 10px;
             background: white;
         }
+
         th, td {
-            padding: 14px;
-            border-bottom: 1px solid var(--border);
-        }
-        th { 
-            background-color: #f8fafc; 
-            font-weight: 700;
-            color: var(--text-secondary);
-        }
-        tr:last-child td { border-bottom: none; }
-        tr:hover { background-color: #f8fafc; }
-        
-        .status-badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 700;
-        }
-        .status-in { background-color: #d1fae5; color: #065f46; }
-        .status-out { background-color: #fee2e2; color: #991b1b; }
-        
-        #loading-text {
+            border: 1px solid var(--border-color);
+            padding: 12px;
             text-align: center;
-            color: var(--text-secondary);
-            font-style: italic;
-            padding: 20px;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: var(--bg-color);
+        }
+
+        tr:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .active-badge {
+            background-color: #2b8a3e;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header">
-        <h2>DAILY TIME RECORD</h2>
-        <div id="clock">Loading Time...</div>
+    <div class="container">
+        <h1>Coronacion's Student Daily Time Record</h1>
+
+        <div class="clock-section">
+            <div id="current-date">Loading date...</div>
+            <div id="current-time">00:00:00 AM</div>
+            <div style="margin-top: 5px; color: #a00; font-size: 0.9rem;">Regular Shift: Mon - Thu (8:00 AM - 5:00 PM)</div>
+        </div>
+
+        <div class="inputs-section">
+            <div>
+                <label for="student-number"><b>Student No:</b></label>
+                <input type="text" id="student-number" placeholder="Enter student number">
+            </div>
+            <div>
+                <label for="student-name"><b>Student Name:</b></label>
+                <input type="text" id="student-name" placeholder="Enter student name">
+            </div>
+        </div>
+
+        <div id="status-display" class="status-banner"></div>
+
+        <div class="actions">
+            <button id="btn-in" onclick="logTime('timeIn')">Time In</button>
+            <button id="btn-out" onclick="logTime('timeOut')">Time Out</button>
+        </div>
+
+        <h2>Students Currently Active</h2>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student No.</th>
+                        <th>Name</th>
+                        <th>Time In</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="active-table-body">
+                    <!-- Currently clocked in students will show here -->
+                </tbody>
+            </table>
+        </div>
+
+        <h2>Past Logs History</h2>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Student No.</th>
+                        <th>Name</th>
+                        <th>Time In</th>
+                        <th>Time Out</th>
+                        <th>Overtime</th>
+                        <th>Undertime</th>
+                    </tr>
+                </thead>
+                <tbody id="dtr-table-body">
+                    <!-- Logs appear here -->
+                </tbody>
+            </table>
+        </div>
     </div>
-    
-    <div class="form-group">
-        <label for="emp-name">Employee Name or ID</label>
-        <input type="text" id="emp-name" placeholder="Enter your name or ID number">
-    </div>
-    
-    <div class="controls">
-        <button class="btn-in" onclick="clockIn()">⏱️ Clock In</button>
-        <button class="btn-out" onclick="clockOut()">⏱️ Clock Out</button>
-    </div>
 
-    <div class="table-wrapper">
-        <table>
-            <thead>
-                <tr>
-                    <th>Employee</th>
-                    <th>Date</th>
-                    <th>Time In</th>
-                    <th>Time Out</th>
-                    <th>Hours Worked</th>
-                </tr>
-            </thead>
-            <tbody id="dtr-log">
-                <tr><td colspan="5" id="loading-text">Connecting to cloud storage...</td></tr>
-            </tbody>
-        </table>
-    </div>
-</div>
+    <script>
+        const SHIFT_IN_HOUR = 8;
+        const SHIFT_OUT_HOUR = 17; // 5 PM in 24-hour format
 
-<script>
-    function updateClock() {
-        const now = new Date();
-        const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-        document.getElementById('clock').innerText = timeStr;
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
-
-    function clockIn() { logTime('IN'); }
-    function clockOut() { logTime('OUT'); }
-
-    document.addEventListener('DOMContentLoaded', fetchLogs);
-
-    async function fetchLogs() {
-        const url = "https://api.jsonbin.io/v3/b/" + BIN_ID + "/latest";
-        try {
-            const response = await fetch(url, {
-                method: "GET",
-                headers: { "X-Master-Key": API_KEY }
-            });
-            const data = await response.json();
+        // Live clock
+        function updateClock() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+            const dateStr = now.toLocaleDateString([], { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
             
-            if (data.record && data.record.logs) {
-                displayLogs(data.record.logs);
-            } else {
-                displayLogs([]);
-            }
-        } catch (error) {
-            console.error("Error fetching logs:", error);
-            displayLogs([]);
+            document.getElementById('current-time').textContent = timeStr;
+            document.getElementById('current-date').textContent = dateStr;
         }
-    }
+        setInterval(updateClock, 1000);
+        updateClock();
 
-    async function logTime(type) {
-        const empName = document.getElementById('emp-name').value.trim();
-        
-        if (!empName) {
-            alert("Please enter your Employee Name or ID first!");
-            return;
+        function getDateKey() {
+            return new Date().toISOString().split('T');
         }
 
-        const now = new Date();
-        const dateStr = now.toLocaleDateString();
-        const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        function getDTRData() {
+            const data = localStorage.getItem('coronacion_multi_logs');
+            return data ? JSON.parse(data) : [];
+        }
 
-        const url = "https://api.jsonbin.io/v3/b/" + BIN_ID;
+        function saveDTRData(data) {
+            localStorage.setItem('coronacion_multi_logs', JSON.stringify(data));
+        }
 
-        try {
-            const getResponse = await fetch(url + "/latest", {
-                method: "GET",
-                headers: { "X-Master-Key": API_KEY }
-            });
-            const getData = await getResponse.json();
+        // SEEDING FUNCTION: Pushed false logs into full array storage
+        function seedInitialData() {
+            const data = getDTRData();
             
-            let currentLogs = [];
-            if (getData.record && getData.record.logs) {
-                currentLogs = getData.record.logs;
+            const hasJohnPaul = data.some(log => log.date === "2026-04-27" && log.number === "24-00376");
+            
+            if (!hasJohnPaul) {
+                data.push({
+                    date: "2026-04-27",
+                    number: "24-00376",
+                    name: "John Paul C. Coronacion",
+                    timeIn: "04:28 PM",
+                    timeOut: "05:12 PM",
+                    overtime: "12 mins",
+                    undertime: "8 hrs 28 mins"
+                });
+                saveDTRData(data);
+            }
+        }
+
+        function logTime(type) {
+            const currentDay = new Date().getDay(); // 0 = Sun, 5 = Fri, 6 = Sat
+
+            if (currentDay === 5 || currentDay === 6 || currentDay === 0) {
+                showErrorBanner("There are no classes today.");
+                return;
             }
 
-            // Find if this employee has an existing row TODAY
-            let existingIndex = currentLogs.findIndex(log => log.employee === empName && log.date === dateStr);
+            const numInput = document.getElementById('student-number').value.trim();
+            const nameInput = document.getElementById('student-name').value.trim();
+            
+            if (!numInput || !nameInput) {
+                alert('Please enter both student number and name first.');
+                return;
+            }
 
-            if (type === 'IN') {
-                if (existingIndex !== -1 && currentLogs[existingIndex].timeIn) {
-                    alert("You have already clocked in for today!");
+            const data = getDTRData();
+            const dateKey = getDateKey();
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+
+            if (type === 'timeIn') {
+                // Prevent duplicate active logins for same student on the same day
+                const alreadyIn = data.some(log => log.date === dateKey && log.number === numInput && log.timeOut === '--');
+                if (alreadyIn) {
+                    alert('This student is already actively logged in today!');
                     return;
                 }
-                
-                const newEntry = { 
-                    employee: empName, 
-                    date: dateStr, 
-                    timeIn: timeStr, 
-                    timeInRaw: now.toISOString(), 
-                    timeOut: null, 
-                    hours: '--' 
-                };
-                currentLogs.unshift(newEntry);
-            } 
-            else if (type === 'OUT') {
-                // FALLBACK: If employee clicked OUT without an IN, create a standalone OUT row!
-                if (existingIndex === -1) {
-                    const newEntry = { 
-                        employee: empName, 
-                        date: dateStr, 
-                        timeIn: null, 
-                        timeInRaw: null, 
-                        timeOut: timeStr, 
-                        hours: '--' 
-                    };
-                    currentLogs.unshift(newEntry);
-                } else {
-                    if (currentLogs[existingIndex].timeOut) {
-                        alert("You have already clocked out for today!");
-                        return;
-                    }
 
-                    currentLogs[existingIndex].timeOut = timeStr;
-                    
-                    if (currentLogs[existingIndex].timeInRaw) {
-                        const timeInObj = new Date(currentLogs[existingIndex].timeInRaw);
-                        const diffMs = now - timeInObj;
-                        const diffHrs = diffMs / (1000 * 60 * 60);
-                        currentLogs[existingIndex].hours = diffHrs.toFixed(2) + " hrs";
-                    }
+                // Add new entry
+                data.push({
+                    date: dateKey,
+                    number: numInput,
+                    name: nameInput,
+                    timeIn: timeStr,
+                    timeOut: '--',
+                    overtime: '--',
+                    undertime: '--'
+                });
+                showStatusBanner(type, timeStr, nameInput);
+            } 
+            else if (type === 'timeOut') {
+                // Find open active log for that student on current day
+                const activeLog = data.find(log => log.date === dateKey && log.number === numInput && log.timeOut === '--');
+                
+                if (!activeLog) {
+                    alert('No matching active login found for this student today.');
+                    return;
                 }
+
+                activeLog.timeOut = timeStr;
+                calculateHours(activeLog, now);
+                showStatusBanner(type, timeStr, nameInput);
             }
 
-            const updateResponse = await fetch(url, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-Master-Key": API_KEY
-                },
-                body: JSON.stringify({ logs: currentLogs })
+            saveDTRData(data);
+            
+            // CLEAR INPUTS so the next student can step up
+            document.getElementById('student-number').value = '';
+            document.getElementById('student-name').value = '';
+            
+            renderTables();
+        }
+
+        function calculateHours(record, outDate) {
+            const dateKey = record.date;
+            
+            const inParts = record.timeIn.split(' ');
+            const inHM = inParts.split(':');
+            let inH = parseInt(inHM);
+            let inM = parseInt(inHM);
+            const inIsPM = inParts === 'PM';
+            if (inIsPM && inH !== 12) inH += 12;
+            if (!inIsPM && inH === 12) inH = 0;
+
+            const inDate = new Date(dateKey);
+            inDate.setHours(inH, inM, 0);
+
+            let undertimeMinutes = 0;
+            let overtimeMinutes = 0;
+
+            const shiftInTarget = new Date(dateKey);
+            shiftInTarget.setHours(SHIFT_IN_HOUR, 0, 0);
+
+            const shiftOutTarget = new Date(dateKey);
+            shiftOutTarget.setHours(SHIFT_OUT_HOUR, 0, 0);
+
+            if (inDate > shiftInTarget) {
+                undertimeMinutes += (inDate - shiftInTarget) / (1000 * 60);
+            }
+            if (outDate < shiftOutTarget) {
+                undertimeMinutes += (shiftOutTarget - outDate) / (1000 * 60);
+            }
+
+            if (outDate > shiftOutTarget) {
+                overtimeMinutes += (outDate - shiftOutTarget) / (1000 * 60);
+            }
+
+            record.undertime = undertimeMinutes > 0 ? formatTimeText(undertimeMinutes) : '--';
+            record.overtime = overtimeMinutes > 0 ? formatTimeText(overtimeMinutes) : '--';
+        }
+
+        function formatTimeText(totalMinutes) {
+            const hrs = Math.floor(totalMinutes / 60);
+            const mins = Math.floor(totalMinutes % 60);
+            
+            let result = '';
+            if (hrs > 0) result += `${hrs} hr${hrs > 1 ? 's' : ''} `;
+            if (mins > 0) result += `${mins} min${mins > 1 ? 's' : ''}`;
+            
+            return result.trim() || '--';
+        }
+
+        function showStatusBanner(type, time, name) {
+            const banner = document.getElementById('status-display');
+            banner.style.display = 'block';
+            
+            const isIn = type === 'timeIn';
+            banner.className = `status-banner ${isIn ? 'status-in' : 'status-out'}`;
+            banner.textContent = `${name} successfully marked ${isIn ? 'Time In' : 'Time Out'} at ${time}`;
+        }
+
+        function showErrorBanner(message) {
+            const banner = document.getElementById('status-display');
+            banner.style.display = 'block';
+            banner.className = 'status-banner status-error';
+            banner.textContent = message;
+        }
+
+        function renderTables() {
+            const data = getDTRData();
+            const dateKey = getDateKey();
+            
+            const activeBody = document.getElementById('active-table-body');
+            const historyBody = document.getElementById('dtr-table-body');
+            
+            activeBody.innerHTML = '';
+            historyBody.innerHTML = '';
+
+            // 1. Populate Active Table (Currently logged in today)
+            const activeLogs = data.filter(log => log.date === dateKey && log.timeOut === '--');
+            
+            if (activeLogs.length === 0) {
+                activeBody.innerHTML = '<tr><td colspan="4">No students active currently.</td></tr>';
+            } else {
+                activeLogs.forEach(log => {
+                    const row = `
+                        <tr>
+                            <td>${log.number}</td>
+                            <td>${log.name}</td>
+                            <td>${log.timeIn}</td>
+                            <td><span class="active-badge">Active</span></td>
+                        </tr>
+                    `;
+                    activeBody.innerHTML += row;
+                });
+            }
+
+            // 2. Populate History Table (Completed logs or past logs)
+            // Sort by date descending
+            const sortedHistory = [...data].sort((a, b) => b.date.localeCompare(a.date));
+
+            if (sortedHistory.length === 0) {
+                historyBody.innerHTML = '<tr><td colspan="7">No logs found for this period.</td></tr>';
+                return;
+            }
+
+            sortedHistory.forEach(log => {
+                const row = `
+                    <tr>
+                        <td><b>${log.date}</b></td>
+                        <td>${log.number}</td>
+                        <td>${log.name}</td>
+                        <td>${log.timeIn}</td>
+                        <td>${log.timeOut}</td>
+                        <td style="color: #c92a2a; font-weight: bold;">${log.overtime}</td>
+                        <td style="color: #721c24;">${log.undertime}</td>
+                    </tr>
+                `;
+                historyBody.innerHTML += row;
             });
-
-            if (!updateResponse.ok) throw new Error("Cloud rejected the update.");
-
-            displayLogs(currentLogs);
-            alert(`Successfully clocked ${type}!`);
-        } catch (error) {
-            console.error("Error saving log:", error);
-            // This is the fallback alert if the API credentials themselves fail.
-            alert("Connection error! Please check that your Master Key and Bin ID are mapped properly.");
         }
-    }
 
-    function displayLogs(logs) {
-        const logTable = document.getElementById('dtr-log');
-        if (!logTable) return;
-        logTable.innerHTML = '';
-        
-        if (logs.length === 0) {
-            logTable.innerHTML = '<tr><td colspan="5" style="text-align:center;">No logs recorded yet.</td></tr>';
-            return;
-        }
-        
-        logs.forEach(log => {
-            const row = `<tr>
-                <td style="font-weight:600;">${log.employee || 'N/A'}</td>
-                <td>${log.date || ''}</td>
-                <td>${log.timeIn ? `<span class="status-badge status-in">IN</span> ${log.timeIn}` : '--'}</td>
-                <td>${log.timeOut ? `<span class="status-badge status-out">OUT</span> ${log.timeOut}` : '--'}</td>
-                <td style="font-weight:bold; color:var(--primary);">${log.hours || '--'}</td>
-            </tr>`;
-            logTable.innerHTML += row;
-        });
-    }
-</script>
-
+        // Initialize view & run the seed injector
+        seedInitialData();
+        renderTables();
+    </script>
 </body>
 </html>
