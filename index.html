@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- ⚠️ STEP 1: CAREFULLY REPLACE THE TWO STRINGS BELOW -->
+    <script>
+        const API_KEY = "$2a$10$6sdqD84mGOrtV0iQCoqEiuwm6NLY/wQMAh7VUfRzQNiF13gTLRTaO"; // Get from API Keys page on JSONBin
+        const BIN_ID = "69f6f08caaba88219766176c";   // Get from the Bins page on JSONBin
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daily Time Record</title>
@@ -95,10 +101,6 @@
 </div>
 
 <script>
-    // ⚠️ Replace these with your actual credentials from JSONBin
-    const API_KEY = "$2a$10$6sdqD84mGOrtV0iQCoqEiuwm6NLY/wQMAh7VUfRzQNiF13gTLRTaO";
-    const BIN_ID = "69f6f08caaba88219766176c";
-
     // Mapped button events to bypass the "is not defined" console error
     function clockIn() { logTime('IN'); }
     function clockOut() { logTime('OUT'); }
