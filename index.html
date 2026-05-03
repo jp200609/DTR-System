@@ -3,23 +3,23 @@
 <head>
     <!-- ⚠️ REPLACE THE TWO STRINGS BELOW -->
     <script>
-        const API_KEY = "$2a$10$6sdqD84mGOrtV0iQCoqEiuwm6NLY/wQMAh7VUfRzQNiF13gTLRTaO"; 
+        const API_KEY = "\$2a\$10\$6sdqD84mGOrtV0iQCoqEiuwm6NLY/wQMAh7VUfRzQNiF13gTLRTaO"; 
         const BIN_ID = "69f6fe2736566621a81c72da";   
     </script>
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daily Time Record</title>
+    <title>Student Daily Time Record</title>
     <style>
         :root {
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
-            --bg: #f1f5f9;
+            --primary: #dc2626;
+            --primary-hover: #b91c1c;
+            --bg: #fef2f2;
             --card: #ffffff;
-            --text: #0f172a;
-            --text-secondary: #475569;
-            --border: #e2e8f0;
-            --success: #10b981;
+            --text: #1e1b4b;
+            --text-secondary: #7f1d1d;
+            --border: #fecaca;
+            --success: #16a34a;
             --danger: #ef4444;
         }
         body {
@@ -40,7 +40,8 @@
             background: var(--card);
             padding: 32px;
             border-radius: 16px;
-            box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            box-shadow: 0 10px 25px -5px rgba(220, 38, 38, 0.1), 0 8px 10px -6px rgba(220, 38, 38, 0.05);
+            border: 1px solid var(--border);
         }
         .header {
             text-align: center;
@@ -55,8 +56,8 @@
         #clock {
             font-size: 20px;
             font-weight: 700;
-            color: var(--text-secondary);
-            background: #f8fafc;
+            color: var(--primary);
+            background: #fff5f5;
             padding: 8px 16px;
             border-radius: 8px;
             display: inline-block;
@@ -79,11 +80,12 @@
             font-size: 16px;
             box-sizing: border-box;
             transition: border-color 0.2s;
+            background-color: #fffafb;
         }
         input:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
         }
         .controls {
             display: grid;
@@ -104,12 +106,12 @@
             align-items: center;
             gap: 8px;
         }
-        button:hover { transform: translateY(-1px); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        button:hover { transform: translateY(-1px); box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.15); }
         button:active { transform: translateY(0); }
         .btn-in { background-color: var(--success); color: white; }
-        .btn-in:hover { background-color: #059669; }
+        .btn-in:hover { background-color: #15803d; }
         .btn-out { background-color: var(--danger); color: white; }
-        .btn-out:hover { background-color: #dc2626; }
+        .btn-out:hover { background-color: var(--primary-hover); }
         
         .table-wrapper {
             overflow-x: auto;
@@ -128,12 +130,12 @@
             border-bottom: 1px solid var(--border);
         }
         th { 
-            background-color: #f8fafc; 
+            background-color: #fff5f5; 
             font-weight: 700;
             color: var(--text-secondary);
         }
         tr:last-child td { border-bottom: none; }
-        tr:hover { background-color: #f8fafc; }
+        tr:hover { background-color: #fffafb; }
         
         .status-badge {
             display: inline-block;
@@ -157,12 +159,12 @@
 
 <div class="container">
     <div class="header">
-        <h2>DAILY TIME RECORD</h2>
+        <h2>STUDENT DAILY TIME RECORD</h2>
         <div id="clock">Loading Time...</div>
     </div>
     
     <div class="form-group">
-        <label for="emp-name">Employee Name or ID</label>
+        <label for="emp-name">Student Name or ID</label>
         <input type="text" id="emp-name" placeholder="Enter your name or ID number">
     </div>
     
@@ -175,7 +177,7 @@
         <table>
             <thead>
                 <tr>
-                    <th>Employee</th>
+                    <th>Student</th>
                     <th>Date</th>
                     <th>Time In</th>
                     <th>Time Out</th>
@@ -227,7 +229,7 @@
         const empName = document.getElementById('emp-name').value.trim();
         
         if (!empName) {
-            alert("Please enter your Employee Name or ID first!");
+            alert("Please enter your Student Name or ID first!");
             return;
         }
 
@@ -249,7 +251,6 @@
                 currentLogs = getData.record.logs;
             }
 
-            // Find if this employee has an existing row TODAY
             let existingIndex = currentLogs.findIndex(log => log.employee === empName && log.date === dateStr);
 
             if (type === 'IN') {
@@ -269,32 +270,23 @@
                 currentLogs.unshift(newEntry);
             } 
             else if (type === 'OUT') {
-                // FALLBACK: If employee clicked OUT without an IN, create a standalone OUT row!
                 if (existingIndex === -1) {
-                    const newEntry = { 
-                        employee: empName, 
-                        date: dateStr, 
-                        timeIn: null, 
-                        timeInRaw: null, 
-                        timeOut: timeStr, 
-                        hours: '--' 
-                    };
-                    currentLogs.unshift(newEntry);
-                } else {
-                    if (currentLogs[existingIndex].timeOut) {
-                        alert("You have already clocked out for today!");
-                        return;
-                    }
-
-                    currentLogs[existingIndex].timeOut = timeStr;
-                    
-                    if (currentLogs[existingIndex].timeInRaw) {
-                        const timeInObj = new Date(currentLogs[existingIndex].timeInRaw);
-                        const diffMs = now - timeInObj;
-                        const diffHrs = diffMs / (1000 * 60 * 60);
-                        currentLogs[existingIndex].hours = diffHrs.toFixed(2) + " hrs";
-                    }
+                    alert("No Clock In record found for today. Please clock in first!");
+                    return;
                 }
+                if (currentLogs[existingIndex].timeOut) {
+                    alert("You have already clocked out for today!");
+                    return;
+                }
+
+                currentLogs[existingIndex].timeOut = timeStr;
+                
+                const timeInObj = new Date(currentLogs[existingIndex].timeInRaw);
+                const diffMs = now - timeInObj;
+                const totalHours = diffMs / (1000 * 60 * 60);
+                
+                const activeHours = totalHours > 5 ? totalHours - 1 : totalHours;
+                currentLogs[existingIndex].hours = activeHours.toFixed(2) + " hrs";
             }
 
             const updateResponse = await fetch(url, {
@@ -312,8 +304,7 @@
             alert(`Successfully clocked ${type}!`);
         } catch (error) {
             console.error("Error saving log:", error);
-            // This is the fallback alert if the API credentials themselves fail.
-            alert("Connection error! Please check that your Master Key and Bin ID are mapped properly.");
+            alert("Connection error! Please make sure your Master Key and Bin ID are mapped properly.");
         }
     }
 
@@ -342,4 +333,5 @@
 
 </body>
 </html>
+
 
