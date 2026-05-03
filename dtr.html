@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Daily Time Record</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+            --border: #e2e8f0;
+        }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--card);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+        h2 {
+            margin-top: 0;
+            color: var(--primary);
+            text-align: center;
+        }
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        button:hover { opacity: 0.9; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-in { background-color: #10b981; color: white; }
+        .btn-out { background-color: #ef4444; color: white; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 14px;
+        }
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+        th { background-color: #f1f5f9; }
+        #loading-text {
+            text-align: center;
+            color: #64748b;
+            font-style: italic;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Cloud DTR</h2>
+    
+    <div class="controls">
+        <button class="btn-in" onclick="logTime('IN')">⏱️ Clock In</button>
+        <button class="btn-out" onclick="logTime('OUT')">⏱️ Clock Out</button>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody id="dtr-log">
+            <tr><td colspan="3" id="loading-text">Loading logs from cloud...</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Firebase SDKs -->
+<script type="module">
+  import { initializeApp } from "https://gstatic.com";
+  import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://gstatic.com";
+
+  // TODO: Replace with your actual Firebase project configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyBRDvPUgdiFfRXAvTMoIIIIwSCUT0c2xjs",
+    authDomain: "daily-time-record-system-a8b17.firebaseapp.com",
+    projectId: "daily-time-record-system-a8b17",
+    storageBucket: "daily-time-record-system-a8b17.firebasestorage.app",
+    messagingSenderId: "558064797633",
+    appId: "1:558064797633:web:af952b566994a972ea1140"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const logsCollection = collection(db, "dtr_logs");
+
+  // Function to save a new log to the cloud
+  window.logTime = async function(type) {
+      const now = new Date();
+      const dateStr = now.toLocaleDateString();
+      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+      try {
+          await addDoc(logsCollection, {
+              date: dateStr,
+              time: timeStr,
+              status: type,
+              timestamp: now // Kept for chronological sorting
+          });
+      } catch (error) {
+          console.error("Error adding document: ", error);
+          alert("Failed to save to cloud. Check console for errors.");
+      }
+  };
+
+  // Function to pull and listen to logs in real-time from the cloud
+  const q = query(logsCollection, orderBy("timestamp", "desc"));
+  onSnapshot(q, (snapshot) => {
+      const logTable = document.getElementById('dtr-log');
+      logTable.innerHTML = '';
+      
+      if (snapshot.empty) {
+          logTable.innerHTML = '<tr><td colspan="3" style="text-align:center;">No logs recorded yet.</td></tr>';
+          return;
+      }
+
+      snapshot.forEach((doc) => {
+          const log = doc.data();
+          const row = `<tr>
+              <td>${log.date}</td>
+              <td>${log.time}</td>
+              <td style="color: ${log.status === 'IN' ? '#10b981' : '#ef4444'}; font-weight: bold;">
+                  ${log.status}
+              </td>
+          </tr>`;
+          logTable.innerHTML += row;
+      });
+  });
+</script>
+
+</body>
+</html>
