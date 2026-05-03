@@ -69,6 +69,93 @@
             padding: 10px;
         }
     </style>
+
+    <script>
+        // ⚠️ Replace these with your actual credentials from JSONBin
+        const API_KEY = "$2a$10$6sdqD84mGOrtV0iQCoqEiuwm6NLY/wQMAh7VUfRzQNiF13gTLRTaO";
+        const BIN_ID = "69f6f08caaba88219766176c";
+
+        // Read logs on startup
+        document.addEventListener('DOMContentLoaded', fetchLogs);
+
+        async function fetchLogs() {
+            try {
+                const response = await fetch(`https://jsonbin.io{BIN_ID}/latest`, {
+                    headers: { "X-Master-Key": API_KEY }
+                });
+                const data = await response.json();
+                const record = data.record || {};
+                displayLogs(record.logs || []);
+            } catch (error) {
+                console.error("Error fetching logs:", error);
+                displayLogs([]);
+            }
+        }
+
+        async function logTime(type) {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString();
+            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const newEntry = { date: dateStr, time: timeStr, status: type };
+
+            try {
+                // 1. Get current data
+                const getResponse = await fetch(`https://jsonbin.io{BIN_ID}/latest`, {
+                    headers: { "X-Master-Key": API_KEY }
+                });
+                const getData = await getResponse.json();
+                
+                let currentLogs = [];
+                if (getData.record && getData.record.logs) {
+                    currentLogs = getData.record.logs;
+                }
+
+                // 2. Add new log to the top
+                currentLogs.unshift(newEntry);
+
+                // 3. Save it back to the cloud
+                const updateResponse = await fetch(`https://jsonbin.io{BIN_ID}`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-Master-Key": API_KEY
+                    },
+                    body: JSON.stringify({ logs: currentLogs })
+                });
+
+                if (!updateResponse.ok) {
+                    throw new Error("Cloud rejected the update.");
+                }
+
+                displayLogs(currentLogs);
+            } catch (error) {
+                console.error("Error saving log:", error);
+                alert("Failed to reach cloud database. Check your keys or set your bin to Public!");
+            }
+        }
+
+        function displayLogs(logs) {
+            const logTable = document.getElementById('dtr-log');
+            if (!logTable) return;
+            logTable.innerHTML = '';
+            
+            if (logs.length === 0) {
+                logTable.innerHTML = '<tr><td colspan="3" style="text-align:center;">No logs recorded yet.</td></tr>';
+                return;
+            }
+            
+            logs.forEach(log => {
+                const row = `<tr>
+                    <td>${log.date || ''}</td>
+                    <td>${log.time || ''}</td>
+                    <td style="color: ${log.status === 'IN' ? '#10b981' : '#ef4444'}; font-weight: bold;">
+                        ${log.status || ''}
+                    </td>
+                </tr>`;
+                logTable.innerHTML += row;
+            });
+        }
+    </script>
 </head>
 <body>
 
@@ -94,72 +181,7 @@
     </table>
 </div>
 
-<script>
-    // ⚠️ Replace these with your actual credentials from JSONBin
-    const API_KEY = "$2a$10$6sdqD84mGOrtV0iQCoqEiuwm6NLY/wQMAh7VUfRzQNiF13gTLRTaO";
-    const BIN_ID = "69f6f08caaba88219766176c";
-
-    // Load logs on startup
-    document.addEventListener('DOMContentLoaded', fetchLogs);
-
-       async function fetchLogs() {
-        try {
-            const response = await fetch(`https://jsonbin.io{BIN_ID}/latest`, {
-                headers: { "X-Master-Key": API_KEY }
-            });
-            const data = await response.json();
-            
-            // Fail-safe: if the structure is broken or missing, default to an empty array
-            const record = data.record || {};
-            displayLogs(record.logs || []);
-        } catch (error) {
-            console.error("Error fetching logs:", error);
-            // Don't show an alert on load, just show empty table
-            displayLogs([]);
-        }
-    }
-
-    async function logTime(type) {
-        const now = new Date();
-        const dateStr = now.toLocaleDateString();
-        const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-        const newEntry = { date: dateStr, time: timeStr, status: type };
-
-        try {
-            // 1. Get current data
-            const getResponse = await fetch(`https://jsonbin.io{BIN_ID}/latest`, {
-                headers: { "X-Master-Key": API_KEY }
-            });
-            const getData = await getResponse.json();
-            
-            // Fail-safe: ensure it is always an array
-            let currentLogs = [];
-            if (getData.record && getData.record.logs) {
-                currentLogs = getData.record.logs;
-            }
-
-            // 2. Add new log to the top
-            currentLogs.unshift(newEntry);
-
-            // 3. Save it back to the cloud
-            const updateResponse = await fetch(`https://jsonbin.io{BIN_ID}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-Master-Key": API_KEY
-                },
-                body: JSON.stringify({ logs: currentLogs })
-            });
-
-            if (!updateResponse.ok) {
-                throw new Error("Cloud rejected the update.");
-            }
-
-            displayLogs(currentLogs);
-        } catch (error) {
-            console.error("Error saving log:", error);
-            alert("Failed to reach cloud database. Check your keys or set your bin to Public!");
-        }
-    }
+</body>
+</html>
 
 
