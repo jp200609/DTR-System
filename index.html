@@ -3,8 +3,8 @@
 <head>
     <!-- ⚠️ REPLACE THE TWO STRINGS BELOW -->
     <script>
-        const API_KEY = "$2a$10$6sdqD84mGOrtV0iQCoqEiuwm6NLY/wQMAh7VUfRzQNiF13gTLRTaO"; 
-        const BIN_ID = "69f6f96c36566621a81c61f4";   
+    const API_KEY = "$2a$10$6sdqD84mGOrtV0iQCoqEiuwm6NLY/wQMAh7VUfRzQNiF13gTLRTaO"; 
+    const BIN_ID = "69f6f96c36566621a81c61f4";   
     </script>
 
     <meta charset="UTF-8">
@@ -205,13 +205,18 @@
     document.addEventListener('DOMContentLoaded', fetchLogs);
 
     // 2. Fetch and Render Logs
-    async function fetchLogs() {
+        async function fetchLogs() {
         const url = "https://jsonbin.io" + BIN_ID + "/latest";
         try {
             const response = await fetch(url, {
                 method: "GET",
                 headers: { "X-Master-Key": API_KEY }
             });
+            
+            if (!response.ok) {
+                throw new Error("Cloud rejected fetch.");
+            }
+            
             const data = await response.json();
             
             if (data.record && data.record.logs) {
@@ -224,6 +229,7 @@
             displayLogs([]);
         }
     }
+
 
     // 3. Log Logic (Solves the split issue & calculates hours)
     async function logTime(type) {
