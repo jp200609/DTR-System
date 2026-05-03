@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cloud Daily Time Record</title>
+    <title>Shared Cloud DTR</title>
     <style>
         :root {
             --primary: #2563eb;
@@ -69,11 +69,6 @@
             padding: 10px;
         }
     </style>
-
-    
-    <script src="https://gstatic.com"></script>
-    
-    <script src="https://gstatic.com"></script>
 </head>
 <body>
 
@@ -94,80 +89,89 @@
             </tr>
         </thead>
         <tbody id="dtr-log">
-            <tr><td colspan="3" id="loading-text">Loading logs from cloud...</td></tr>
+            <tr><td colspan="3" id="loading-text">Connecting to cloud storage...</td></tr>
         </tbody>
     </table>
 </div>
 
 <script>
-  
-  const firebaseConfig = {
-    apiKey: "AIzaSyBRDvPUgdiFfRXAvTMoIIIIwSCUT0c2xjs",
-    authDomain: "daily-time-record-system-a8b17.firebaseapp.com",
-    projectId: "daily-time-record-system-a8b17",
-    storageBucket: "daily-time-record-system-a8b17.firebasestorage.app",
-    messagingSenderId: "558064797633",
-    appId: "1:558064797633:web:af952b566994a972ea1140"
-  };
+    // ⚠️ Replace these with your actual credentials from JSONBin
+    const API_KEY = "$2a$10$6sdqD84mGOrtV0iQCoqEiuwm6NLY/wQMAh7VUfRzQNiF13gTLRTaO";
+    const BIN_ID = "69f6ef3c36566621a81c3e9a";
 
-  
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
+    // Load logs on startup
+    document.addEventListener('DOMContentLoaded', fetchLogs);
 
-  
-  function logTime(type) {
-      const now = new Date();
-      const dateStr = now.toLocaleDateString();
-      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    async function fetchLogs() {
+        try {
+            const response = await fetch(`https://jsonbin.io{BIN_ID}/latest`, {
+                headers: { "X-Master-Key": API_KEY }
+            });
+            const data = await response.json();
+            displayLogs(data.record.logs || []);
+        } catch (error) {
+            console.error("Error fetching logs:", error);
+        }
+    }
 
-      db.collection("dtr_logs").add({
-          date: dateStr,
-          time: timeStr,
-          status: type,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp() // Accurate cloud time
-      })
-      .then(() => {
-          console.log("Document successfully written!");
-      })
-      .catch((error) => {
-          console.error("Error writing document: ", error);
-          alert("Failed to save to cloud.");
-      });
-  }
+    async function logTime(type) {
+        const now = new Date();
+        const dateStr = now.toLocaleDateString();
+        const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        const newEntry = { date: dateStr, time: timeStr, status: type };
 
-  
-  db.collection("dtr_logs").orderBy("timestamp", "desc")
-    .onSnapshot((snapshot) => {
+        try {
+            // 1. Get current data
+            const getResponse = await fetch(`https://jsonbin.io{BIN_ID}/latest`, {
+                headers: { "X-Master-Key": API_KEY }
+            });
+            const getData = await getResponse.json();
+            let currentLogs = getData.record.logs || [];
+
+            // 2. Add new log to the top
+            currentLogs.unshift(newEntry);
+
+            // 3. Save it back to the cloud
+            await fetch(`https://jsonbin.io{BIN_ID}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-Master-Key": API_KEY
+                },
+                body: JSON.stringify({ logs: currentLogs })
+            });
+
+            displayLogs(currentLogs);
+        } catch (error) {
+            console.error("Error saving log:", error);
+            alert("Failed to reach cloud database.");
+        }
+    }
+
+    function displayLogs(logs) {
         const logTable = document.getElementById('dtr-log');
         logTable.innerHTML = '';
         
-        if (snapshot.empty) {
+        if (logs.length === 0) {
             logTable.innerHTML = '<tr><td colspan="3" style="text-align:center;">No logs recorded yet.</td></tr>';
             return;
         }
-
-        snapshot.forEach((doc) => {
-            const log = doc.data();
+        
+        logs.forEach(log => {
             const row = `<tr>
-                <td>${log.date || ''}</td>
-                <td>${log.time || ''}</td>
+                <td>${log.date}</td>
+                <td>${log.time}</td>
                 <td style="color: ${log.status === 'IN' ? '#10b981' : '#ef4444'}; font-weight: bold;">
-                    ${log.status || ''}
+                    ${log.status}
                 </td>
             </tr>`;
             logTable.innerHTML += row;
         });
-    }, (error) => {
-        console.error("Snapshot error: ", error);
-       
-        if (error.message.includes("requires an index")) {
-             document.getElementById('dtr-log').innerHTML = 
-             '<tr><td colspan="3" style="text-align:center; color:red;">Database is missing an index. Please check your browser console for the blue link to create it!</td></tr>';
-        }
-    });
+    }
 </script>
 
 </body>
 </html>
+
 
 
