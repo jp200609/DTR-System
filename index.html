@@ -213,20 +213,30 @@
         }
     }
 
-    function doTimeIn() {
-        var d = new Date(); // shorthand for current date object
-        var day = d.getDay(); // stores number 0-6 to check the day
+        function doTimeIn() {
+        var d = new Date(); 
+        var day = d.getDay(); 
+        var hour = d.getHours(); // I added this to check the hour
 
-        // Block login if it's Friday (5), Saturday (6), or Sunday (0)
+        // 1. Block if it is Friday, Saturday, or Sunday
         if (day == 5 || day == 6 || day == 0) {
             document.getElementById('status-msg').innerHTML = "No classes today!";
             return;
         }
 
-        // Grab whatever the student typed
+        // 2. Block if it is 5:00 PM or later (17 in 24-hour time)
+        if (hour >= 17) {
+            document.getElementById('status-msg').innerHTML = "Cannot Log In: Shift ended at 5:00 PM!";
+            return;
+        }
+
         var s_num = document.getElementById('input_num').value;
         var s_name = document.getElementById('input_name').value;
-        if (s_num == "" || s_name == "") { alert("Fill in details!"); return; }
+        
+        if (s_num == "" || s_name == "") { 
+            alert("Fill in details!"); 
+            return; 
+        }
 
         var allData = getLogs();
         allData.push({
@@ -237,6 +247,7 @@
         localStorage.setItem('student_dtr_v6', JSON.stringify(allData));
         refresh();
     }
+
 
     function doTimeOut() {
         var d = new Date(); 
