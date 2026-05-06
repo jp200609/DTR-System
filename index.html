@@ -1,133 +1,120 @@
 <!DOCTYPE html>
 <html>
 <!-- JOHN PAUL CORONACION -->
-<!-- 24-00376 -->
+<!-- 24 - 00376 -->
 <head>
-    <title>Coronacion DTR System</title>
+    <title>Coronacion's Student Daily Time Record</title>
     <style>
+        :root {
+            --primary: #ff6b6b;
+            --dark: #c92a2a;
+            --bg: #fff5f5;
+        }
+
         body {
-            background-color: #ff9999; /* light red */
-            font-family: "Times New Roman", serif;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: var(--bg);
             margin: 0;
             padding: 20px;
         }
 
-        .main-container {
-            background-color: white;
-            width: 850px;
-            margin-left: auto;
-            margin-right: auto;
-            border: 5px solid darkred;
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: 1px solid #ffc9c9;
+        }
+
+        h1 { color: var(--dark); text-align: center; }
+
+        .clock-box {
+            text-align: center;
+            background: #ffe3e3;
             padding: 20px;
-        }
-
-        .header-section {
-            text-align: center;
-            border-bottom: 2px solid red;
+            border-radius: 10px;
             margin-bottom: 20px;
         }
 
-        .clock-display {
-            background-color: #ffdada;
-            border: 1px dashed red;
-            padding: 10px;
+        #time-display { font-size: 3rem; font-weight: bold; color: var(--dark); }
+
+        .input-area {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
             margin-bottom: 20px;
+            background: #fdf2f2;
+            padding: 15px;
+            border-radius: 8px;
         }
 
-        .data-table {
-            width: 100%;
-            border: 1px solid black;
-        }
+        input { padding: 10px; border: 1px solid #ffc9c9; border-radius: 5px; }
 
-        .data-table th {
-            background-color: red;
+        .btn-row { text-align: center; margin-bottom: 20px; }
+
+        button {
+            padding: 10px 25px;
+            background: var(--primary);
             color: white;
-            border: 1px solid black;
-        }
-
-        .data-table td {
-            border: 1px solid gray;
-            text-align: center;
-            padding: 5px;
-        }
-
-        .my-button {
-            padding: 10px;
-            background-color: red;
-            color: white;
+            border: none;
+            border-radius: 5px;
             font-weight: bold;
-            width: 120px;
             cursor: pointer;
         }
 
-        .del-btn {
-            background-color: black;
-            color: white;
-            font-size: 10px;
-            cursor: pointer;
-        }
+        button:hover { background: var(--dark); }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+
+        th { background: var(--primary); color: white; padding: 12px; }
+
+        td { border: 1px solid #ffc9c9; padding: 10px; text-align: center; }
+
+        .del-btn { background: black; font-size: 10px; padding: 5px; color: white; }
     </style>
 </head>
 <body>
 
-<div class="main-container">
-    <div class="header-section">
-        <h1>Coronacion's Student Daily Time Record</h1>
-        <p>Shift: Mon-Thu (8:00 AM to 5:00 PM)</p>
-    </div>
+<div class="container">
+    <h1>Coronacion's Student Daily Time Record</h1>
 
-    <div class="clock-display">
-        <center>
-            <h2 id="live-date">Date here</h2>
-            <h1 id="live-time" style="font-size: 50px;">Time here</h1>
-        </center>
+    <div class="clock-box">
+        <div id="date-display">Date here...</div>
+        <div id="time-display">00:00:00 AM</div>
+        <p style="color:red; font-weight:bold;">Shift: Mon-Thu (8:00 AM - 5:00 PM)</p>
     </div>
 
     <!-- This is where the student types their info -->
-    <div style="background-color: #eeeeee; padding: 15px; border: 1px solid black;">
-        <center>
-            <div>
-                Student Number: <input type="text" id="s_num">
-            </div>
-            <div style="margin-top:10px; margin-bottom:10px;">
-                Full Name: <input type="text" id="s_name">
-            </div>
-            
-            <div id="msg-box" style="color:red; font-weight:bold; margin-bottom:10px;"></div>
-
-            <button class="my-button" onclick="doTimeIn()">TIME IN</button>
-            <button class="my-button" onclick="doTimeOut()">TIME OUT</button>
-            <!-- Note: Admin button only shows if I type the secret info -->
-            <button id="admin-btn" class="my-button" style="background-color:gray; display:none;" onclick="showAdmin()">ADMIN MODE</button>
-        </center>
+    <div class="input-area">
+        <input type="text" id="input_num" placeholder="Student Number">
+        <input type="text" id="input_name" placeholder="Full Name">
     </div>
 
-    <br>
-    <h3>ACTIVE STUDENTS</h3>
-    <table class="data-table">
-        <tr>
-            <th>Student No.</th>
-            <th>Student Name</th>
-            <th>In</th>
-            <th>Status</th>
-        </tr>
-        <tbody id="active-list"></tbody>
-    </table>
+    <div class="btn-row">
+        <button onclick="doTimeIn()">Time In</button>
+        <button onclick="doTimeOut()">Time Out</button>
+        <!-- Note: Admin button only shows if I type the secret info -->
+        <button id="admin-btn" style="display:none; background:gray" onclick="activateAdmin()">Admin</button>
+    </div>
 
-    <br>
-    <h3>DTR HISTORY LOGS</h3>
-    <table class="data-table">
-        <tr>
-            <th>Date</th>
-            <th>Student No.</th>
-            <th>Name</th>
-            <th>In</th>
-            <th>Out</th>
-            <th>OT</th>
-            <th>UT</th>
-            <th id="admin-header" style="display:none;">Action</th>
-        </tr>
-        <tbody id="history-list"></tbody>
+    <div id="status-msg" style="text-align:center; color:red; font-weight:bold; margin-bottom:10px"></div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>ID</th>
+                <th>Name</th>
+                <th>In</th>
+                <th>Out</th>
+                <th>OT</th>
+                <th>UT</th>
+                <th id="admin-th" style="display:none">X</th>
+            </tr>
+        </thead>
+        <tbody id="logs-body"></tbody>
     </table>
 </div>
 
@@ -135,135 +122,176 @@
     var isAdmin = false; // NOTE: This starts as false so students cant delete logs
 
     // kinopya ko clock part from a tutorial online
-    function updateMyClock() {
-        var now = new Date();
-        document.getElementById('live-time').innerHTML = now.toLocaleTimeString();
-        document.getElementById('live-date').innerHTML = now.toDateString();
+    function updateClock() {
+        var d = new Date(); // Shorthand for the current time and date
+        document.getElementById('time-display').innerHTML = d.toLocaleTimeString();
+        document.getElementById('date-display').innerHTML = d.toDateString();
         
         // WOW HACKERMAN: If I type the secret admin info, show the Admin button
-        var user = document.getElementById('s_num').value;
-        var name = document.getElementById('s_name').value;
-        if(user == "ADMIN-000" && name == "Cash35JP") {
-            document.getElementById('admin-btn').style.display = "inline";
+        var s_num = document.getElementById('input_num').value;
+        var s_name = document.getElementById('input_name').value;
+        if (s_num == "ADMIN-000" && s_name == "Cash35JP") {
+            document.getElementById('admin-btn').style.display = "inline-block";
         }
     }
-    setInterval(updateMyClock, 1000);
+    setInterval(updateClock, 1000);
 
-    function getSavedData() {
-        var stuff = localStorage.getItem('dtr_data_file');
-        if (stuff == null) { return []; } 
-        else { return JSON.parse(stuff); }
+    // This is where I load the data from the browser memory
+    function getLogs() {
+        var raw = localStorage.getItem('student_dtr_final');
+        if (raw == null) {
+            return []; // Returns an empty array if there is no data yet
+        } else {
+            return JSON.parse(raw);
+        }
     }
 
     //gumawa ako fake data para example
-    function addMyOwnData() {
-        var allData = getSavedData();
+    function seedData() {
+        var allData = getLogs(); // tio yung 'database' array
         var found = false;
         for (var i = 0; i < allData.length; i++) {
-            if (allData[i].date == "2026-04-27" && allData[i].num == "24-00376") { found = true; }
+            if (allData[i].date == "2026-04-27" && allData[i].num == "24-00376") {
+                found = true;
+            }
         }
         if (found == false) {
-            var myLog = {
+            var myRecord = {
                 date: "2026-04-27", num: "24-00376", name: "John Paul C. Coronacion",
-                tIn: "04:28 PM", tOut: "05:12 PM", ot: "12 mins", ut: "8 hrs 28 mins"
+                tIn: "04:28 PM", tOut: "05:12 PM", ot: "12 mins", ut: "8 hrs 28 mins",
+                raw: "2026-04-27T16:28:00"
             };
-            allData.push(myLog);
-            localStorage.setItem('dtr_data_file', JSON.stringify(allData));
+            allData.push(myRecord);
+            localStorage.setItem('student_dtr_final', JSON.stringify(allData));
         }
     }
 
-    // NOTE: This turns on the delete buttons
-    function showAdmin() {
+    // SECRET HAKERMAN: This turns on the delete buttons
+    function activateAdmin() {
         isAdmin = true;
-        document.getElementById('admin-header').style.display = "table-cell";
-        document.getElementById('msg-box').innerHTML = "ADMIN MODE ACTIVE";
-        showTables();
+        document.getElementById('admin-th').style.display = "table-cell";
+        document.getElementById('status-msg').innerHTML = "ADMIN MODE ACTIVE";
+        refresh();
     }
 
     // NOTE: This function deletes one row from the list
-    function deleteLog(index) {
-        var allData = getSavedData();
-        if(confirm("Delete this log?")) {
-            allData.splice(index, 1); // This removes the item from the array
-            localStorage.setItem('dtr_data_file', JSON.stringify(allData));
-            showTables();
+    function deleteLog(idx) {
+        var allData = getLogs();
+        if (confirm("Delete this?")) {
+            allData.splice(idx, 1); // Removes the log from the array
+            localStorage.setItem('student_dtr_final', JSON.stringify(allData));
+            refresh();
         }
     }
 
     function doTimeIn() {
-        var d = new Date();
-        var day = d.getDay(); 
+        var d = new Date(); // shorthand for current date object
+        var day = d.getDay(); // stores number 0-6 to check the day
+
+        // Block login if it's Friday (5), Saturday (6), or Sunday (0)
         if (day == 5 || day == 6 || day == 0) {
-            document.getElementById('msg-box').innerHTML = "No classes today!";
+            document.getElementById('status-msg').innerHTML = "No classes today!";
             return;
         }
-        var s_num = document.getElementById('s_num').value;
-        var s_name = document.getElementById('s_name').value;
-        if (s_num == "" || s_name == "") { alert("Fill it up!"); return; }
 
-        var allData = getSavedData();
-        var currentDate = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
-        
+        // Grab whatever the student typed
+        var s_num = document.getElementById('input_num').value;
+        var s_name = document.getElementById('input_name').value;
+
+        if (s_num == "" || s_name == "") {
+            alert("Please fill in your details!");
+            return;
+        }
+
+        var allData = getLogs();
         var newEntry = {
-            date: currentDate, num: s_num, name: s_name,
-            tIn: d.toLocaleTimeString(), tOut: "--", ot: "--", ut: "--"
+            date: d.toLocaleDateString(), num: s_num, name: s_name,
+            tIn: d.toLocaleTimeString(), tOut: "--", ot: "--", ut: "--",
+            raw: d.toISOString()
         };
         allData.push(newEntry);
-        localStorage.setItem('dtr_data_file', JSON.stringify(allData));
-        showTables();
+        localStorage.setItem('student_dtr_final', JSON.stringify(allData));
+        
+        document.getElementById('input_num').value = "";
+        document.getElementById('input_name').value = "";
+        refresh();
     }
 
     function doTimeOut() {
-        var d = new Date();
-        var s_num = document.getElementById('s_num').value;
-        var allData = getSavedData();
-        var currentDate = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
+        var d = new Date(); // shorthand object
+        var s_num = document.getElementById('input_num').value;
+        var allData = getLogs();
         var found = false;
 
         for (var i = 0; i < allData.length; i++) {
-            if (allData[i].num == s_num && allData[i].date == currentDate && allData[i].tOut == "--") {
+            // Finding the right student who hasn't logged out yet
+            if (allData[i].num == s_num && allData[i].tOut == "--") {
                 allData[i].tOut = d.toLocaleTimeString();
-                allData[i].ut = "Checked"; 
-                allData[i].ot = "0";
+                
+                // MATH PART: I converted clock hours to minutes to make it easier
+                var inDate = new Date(allData[i].raw);
+                var outDate = d;
+                
+                var targetIn = new Date(inDate); targetIn.setHours(8,0,0);
+                var targetOut = new Date(inDate); targetOut.setHours(17,0,0);
+
+                var utMins = 0;
+                var otMins = 0;
+
+                if (inDate > targetIn) utMins += (inDate - targetIn) / 60000;
+                if (outDate < targetOut) utMins += (targetOut - outDate) / 60000;
+                if (outDate > targetOut) otMins += (outDate - targetOut) / 60000;
+
+                if (utMins > 0) {
+                    var h = Math.floor(utMins / 60); var m = Math.floor(utMins % 60);
+                    allData[i].ut = h + "h " + m + "m";
+                }
+                if (otMins > 0) {
+                    var h = Math.floor(otMins / 60); var m = Math.floor(otMins % 60);
+                    allData[i].ot = h + "h " + m + "m";
+                }
+
                 found = true;
             }
         }
-        if (!found) { alert("Login not found!"); } 
-        else {
-            localStorage.setItem('dtr_data_file', JSON.stringify(allData));
-            showTables();
+
+        if (!found) {
+            alert("Login not found!");
+        } else {
+            localStorage.setItem('student_dtr_final', JSON.stringify(allData));
+            document.getElementById('input_num').value = "";
+            document.getElementById('input_name').value = "";
+            refresh();
         }
     }
 
-    function showTables() {
-        var allData = getSavedData();
-        var activeBody = document.getElementById('active-list');
-        var historyBody = document.getElementById('history-list');
-        var today = new Date().getFullYear() + "-" + (new Date().getMonth() + 1) + "-" + new Date().getDate();
+    function refresh() {
+        var allData = getLogs();
+        var body = document.getElementById('logs-body');
+        body.innerHTML = ""; // Clear table before redrawing
 
-        activeBody.innerHTML = "";
-        historyBody.innerHTML = "";
+        // Show newest on top by looping backwards through the array
+        for (var i = allData.length - 1; i >= 0; i--) {
+            var row = "<tr>" +
+                "<td>" + allData[i].date + "</td>" +
+                "<td>" + allData[i].num + "</td>" +
+                "<td>" + allData[i].name + "</td>" +
+                "<td>" + allData[i].tIn + "</td>" +
+                "<td>" + allData[i].tOut + "</td>" +
+                "<td>" + allData[i].ot + "</td>" +
+                "<td>" + allData[i].ut + "</td>";
 
-        for (var i = 0; i < allData.length; i++) {
-            // Build History Row
-            var row = "<tr><td>"+allData[i].date+"</td><td>"+allData[i].num+"</td><td>"+allData[i].name+"</td><td>"+allData[i].tIn+"</td><td>"+allData[i].tOut+"</td><td>"+allData[i].ot+"</td><td>"+allData[i].ut+"</td>";
-            
             // If admin is on, add a delete button
-            if(isAdmin) {
-                row += "<td><button class='del-btn' onclick='deleteLog("+i+")'>Delete</button></td>";
+            if (isAdmin) {
+                row += "<td><button class='del-btn' onclick='deleteLog(" + i + ")'>DEL</button></td>";
             }
             row += "</tr>";
-            
-            historyBody.innerHTML = row + historyBody.innerHTML; 
-
-            if (allData[i].date == today && allData[i].tOut == "--") {
-                activeBody.innerHTML += "<tr><td>"+allData[i].num+"</td><td>"+allData[i].name+"</td><td>"+allData[i].tIn+"</td><td style='color:green;'>ACTIVE</td></tr>";
-            }
+            body.innerHTML += row;
         }
     }
 
-    addMyOwnData();
-    showTables();
+    seedData();
+    refresh();
 </script>
 
 </body>
