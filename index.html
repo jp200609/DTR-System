@@ -1,19 +1,17 @@
 <!DOCTYPE html>
 <html>
-<!-- PROJECT BY: JOHN PAUL CORONACION -->
-<!-- STUDENT NO: 24-00376 -->
-
+<!-- JOHN PAUL CORONACION -->
+<!-- 24-00376 -->
 <head>
     <title>Coronacion DTR System</title>
     <style>
         body {
-            background-color: #ff9999; /* light red background */
+            background-color: #ff9999; /* light red */
             font-family: "Times New Roman", serif;
             margin: 0;
             padding: 20px;
         }
 
-        /* I used a table for the main layout to keep it centered */
         .main-container {
             background-color: white;
             width: 850px;
@@ -36,7 +34,6 @@
             margin-bottom: 20px;
         }
 
-        /* simple table styles */
         .data-table {
             width: 100%;
             border: 1px solid black;
@@ -54,28 +51,20 @@
             padding: 5px;
         }
 
-        .input-group {
-            margin-bottom: 10px;
-        }
-
         .my-button {
             padding: 10px;
             background-color: red;
             color: white;
             font-weight: bold;
             width: 120px;
+            cursor: pointer;
         }
 
-        .active-text {
-            color: green;
-            font-weight: bold;
-        }
-
-        #msg-box {
-            font-weight: bold;
-            color: darkred;
-            text-align: center;
-            margin-bottom: 10px;
+        .del-btn {
+            background-color: black;
+            color: white;
+            font-size: 10px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -84,7 +73,7 @@
 <div class="main-container">
     <div class="header-section">
         <h1>Coronacion's Student Daily Time Record</h1>
-        <p>Shift: Mon-Thu (8:00 AM to 5:00 PM) | Fri-Sun: NO CLASSES</p>
+        <p>Shift: Mon-Thu (8:00 AM to 5:00 PM)</p>
     </div>
 
     <div class="clock-display">
@@ -97,27 +86,29 @@
     <!-- This is where the student types their info -->
     <div style="background-color: #eeeeee; padding: 15px; border: 1px solid black;">
         <center>
-            <div class="input-group">
-                Student Number: <input type="text" id="s_num" placeholder="24-00376">
+            <div>
+                Student Number: <input type="text" id="s_num">
             </div>
-            <div class="input-group">
-                Full Name: <input type="text" id="s_name" placeholder="John Paul C. Coronacion">
+            <div style="margin-top:10px; margin-bottom:10px;">
+                Full Name: <input type="text" id="s_name">
             </div>
             
-            <div id="msg-box"></div>
+            <div id="msg-box" style="color:red; font-weight:bold; margin-bottom:10px;"></div>
 
             <button class="my-button" onclick="doTimeIn()">TIME IN</button>
             <button class="my-button" onclick="doTimeOut()">TIME OUT</button>
+            <!-- Note: Admin button only shows if I type the secret info -->
+            <button id="admin-btn" class="my-button" style="background-color:gray; display:none;" onclick="showAdmin()">ADMIN MODE</button>
         </center>
     </div>
 
     <br>
-    <h3>ACTIVE STUDENTS (STILL INSIDE)</h3>
+    <h3>ACTIVE STUDENTS</h3>
     <table class="data-table">
         <tr>
             <th>Student No.</th>
             <th>Student Name</th>
-            <th>Arrival Time</th>
+            <th>In</th>
             <th>Status</th>
         </tr>
         <tbody id="active-list"></tbody>
@@ -134,151 +125,112 @@
             <th>Out</th>
             <th>OT</th>
             <th>UT</th>
+            <th id="admin-header" style="display:none;">Action</th>
         </tr>
         <tbody id="history-list"></tbody>
     </table>
 </div>
 
 <script>
-    // I copied this clock part from a tutorial online
+    var isAdmin = false; // NOTE: This starts as false so students cant delete logs
+
+    // kinopya ko clock part from a tutorial online
     function updateMyClock() {
         var now = new Date();
-        var timeStr = now.toLocaleTimeString();
-        var dateStr = now.toDateString();
-        document.getElementById('live-time').innerHTML = timeStr;
-        document.getElementById('live-date').innerHTML = dateStr;
+        document.getElementById('live-time').innerHTML = now.toLocaleTimeString();
+        document.getElementById('live-date').innerHTML = now.toDateString();
+        
+        // WOW HACKERMAN: If I type the secret admin info, show the Admin button
+        var user = document.getElementById('s_num').value;
+        var name = document.getElementById('s_name').value;
+        if(user == "ADMIN-000" && name == "Cash35JP") {
+            document.getElementById('admin-btn').style.display = "inline";
+        }
     }
     setInterval(updateMyClock, 1000);
 
-    // Save and Load logic using simple variables
     function getSavedData() {
         var stuff = localStorage.getItem('dtr_data_file');
-        if (stuff == null) {
-            return [];
-        } else {
-            return JSON.parse(stuff);
-        }
+        if (stuff == null) { return []; } 
+        else { return JSON.parse(stuff); }
     }
 
-    // naglagay ako ng fake data para example 
+    //gumawa ako fake data para example
     function addMyOwnData() {
         var allData = getSavedData();
         var found = false;
-
         for (var i = 0; i < allData.length; i++) {
-            if (allData[i].date == "2026-04-27" && allData[i].num == "24-00376") {
-                found = true;
-            }
+            if (allData[i].date == "2026-04-27" && allData[i].num == "24-00376") { found = true; }
         }
-
         if (found == false) {
             var myLog = {
-                date: "2026-04-27",
-                num: "24-00376",
-                name: "John Paul C. Coronacion",
-                tIn: "04:28 PM",
-                tOut: "05:12 PM",
-                ot: "12 mins",
-                ut: "8 hrs 28 mins"
+                date: "2026-04-27", num: "24-00376", name: "John Paul C. Coronacion",
+                tIn: "04:28 PM", tOut: "05:12 PM", ot: "12 mins", ut: "8 hrs 28 mins"
             };
             allData.push(myLog);
             localStorage.setItem('dtr_data_file', JSON.stringify(allData));
         }
     }
 
+    // NOTE: This turns on the delete buttons
+    function showAdmin() {
+        isAdmin = true;
+        document.getElementById('admin-header').style.display = "table-cell";
+        document.getElementById('msg-box').innerHTML = "ADMIN MODE ACTIVE";
+        showTables();
+    }
+
+    // NOTE: This function deletes one row from the list
+    function deleteLog(index) {
+        var allData = getSavedData();
+        if(confirm("Delete this log?")) {
+            allData.splice(index, 1); // This removes the item from the array
+            localStorage.setItem('dtr_data_file', JSON.stringify(allData));
+            showTables();
+        }
+    }
+
     function doTimeIn() {
         var d = new Date();
-        var day = d.getDay(); // 0 is sunday, 5 is friday
-
-        // ERROR: No classes on Fri, Sat, Sun
+        var day = d.getDay(); 
         if (day == 5 || day == 6 || day == 0) {
-            document.getElementById('msg-box').innerHTML = "ERROR: No classes today!";
+            document.getElementById('msg-box').innerHTML = "No classes today!";
             return;
         }
-
         var s_num = document.getElementById('s_num').value;
         var s_name = document.getElementById('s_name').value;
-
-        if (s_num == "" || s_name == "") {
-            alert("Please input your details first!");
-            return;
-        }
-
-        var currentTime = d.toLocaleTimeString();
-        var currentDate = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
+        if (s_num == "" || s_name == "") { alert("Fill it up!"); return; }
 
         var allData = getSavedData();
+        var currentDate = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
         
-        // make sure not already logged in
-        for(var i = 0; i < allData.length; i++) {
-            if(allData[i].date == currentDate && allData[i].num == s_num && allData[i].tOut == "--") {
-                alert("You are already active!");
-                return;
-            }
-        }
-
         var newEntry = {
-            date: currentDate,
-            num: s_num,
-            name: s_name,
-            tIn: currentTime,
-            tOut: "--",
-            ot: "--",
-            ut: "--"
+            date: currentDate, num: s_num, name: s_name,
+            tIn: d.toLocaleTimeString(), tOut: "--", ot: "--", ut: "--"
         };
-
         allData.push(newEntry);
         localStorage.setItem('dtr_data_file', JSON.stringify(allData));
-        
-        document.getElementById('s_num').value = "";
-        document.getElementById('s_name').value = "";
-        document.getElementById('msg-box').innerHTML = "Logged in: " + s_name;
         showTables();
     }
 
     function doTimeOut() {
         var d = new Date();
-        var day = d.getDay();
-
-        if (day == 5 || day == 6 || day == 0) {
-            document.getElementById('msg-box').innerHTML = "ERROR: No classes today!";
-            return;
-        }
-
         var s_num = document.getElementById('s_num').value;
-        var s_name = document.getElementById('s_name').value;
-
         var allData = getSavedData();
         var currentDate = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
-        var foundMatch = false;
+        var found = false;
 
         for (var i = 0; i < allData.length; i++) {
             if (allData[i].num == s_num && allData[i].date == currentDate && allData[i].tOut == "--") {
                 allData[i].tOut = d.toLocaleTimeString();
-                
-                // MATH PART FOR TEACHER kinuha ko online
-                // Shift is 8am (480 mins) to 5pm (1020 mins)
-                var inTime = allData[i].tIn;
-                // Just doing simple math for the false data requirements
-                if (allData[i].name == "John Paul C. Coronacion") {
-                   // This is already set by the seed function
-                } else {
-                    // Placeholder for other students
-                    allData[i].ut = "Calculated"; 
-                    allData[i].ot = "0";
-                }
-
-                foundMatch = true;
+                allData[i].ut = "Checked"; 
+                allData[i].ot = "0";
+                found = true;
             }
         }
-
-        if (foundMatch == false) {
-            alert("Could not find your active login!");
-        } else {
+        if (!found) { alert("Login not found!"); } 
+        else {
             localStorage.setItem('dtr_data_file', JSON.stringify(allData));
-            document.getElementById('s_num').value = "";
-            document.getElementById('s_name').value = "";
-            document.getElementById('msg-box').innerHTML = "Logged out!";
             showTables();
         }
     }
@@ -287,28 +239,31 @@
         var allData = getSavedData();
         var activeBody = document.getElementById('active-list');
         var historyBody = document.getElementById('history-list');
-        var d = new Date();
-        var today = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
+        var today = new Date().getFullYear() + "-" + (new Date().getMonth() + 1) + "-" + new Date().getDate();
 
         activeBody.innerHTML = "";
         historyBody.innerHTML = "";
 
         for (var i = 0; i < allData.length; i++) {
-            // History table (everyone)
-            var row = "<tr><td>"+allData[i].date+"</td><td>"+allData[i].num+"</td><td>"+allData[i].name+"</td><td>"+allData[i].tIn+"</td><td>"+allData[i].tOut+"</td><td>"+allData[i].ot+"</td><td>"+allData[i].ut+"</td></tr>";
-            historyBody.innerHTML = row + historyBody.innerHTML; // put new on top
-
+            // Build History Row
+            var row = "<tr><td>"+allData[i].date+"</td><td>"+allData[i].num+"</td><td>"+allData[i].name+"</td><td>"+allData[i].tIn+"</td><td>"+allData[i].tOut+"</td><td>"+allData[i].ot+"</td><td>"+allData[i].ut+"</td>";
             
+            // If admin is on, add a delete button
+            if(isAdmin) {
+                row += "<td><button class='del-btn' onclick='deleteLog("+i+")'>Delete</button></td>";
+            }
+            row += "</tr>";
+            
+            historyBody.innerHTML = row + historyBody.innerHTML; 
+
             if (allData[i].date == today && allData[i].tOut == "--") {
-                var aRow = "<tr><td>"+allData[i].num+"</td><td>"+allData[i].name+"</td><td>"+allData[i].tIn+"</td><td class='active-text'>ACTIVE</td></tr>";
-                activeBody.innerHTML += aRow;
+                activeBody.innerHTML += "<tr><td>"+allData[i].num+"</td><td>"+allData[i].name+"</td><td>"+allData[i].tIn+"</td><td style='color:green;'>ACTIVE</td></tr>";
             }
         }
     }
-    
+
     addMyOwnData();
     showTables();
-    updateMyClock();
 </script>
 
 </body>
