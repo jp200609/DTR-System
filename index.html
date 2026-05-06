@@ -1,490 +1,315 @@
 <!DOCTYPE html>
 <html>
+<!-- PROJECT BY: JOHN PAUL CORONACION -->
+<!-- STUDENT NO: 24-00376 -->
+
 <head>
-    <title>Coronacion's Student Daily Time Record</title>
+    <title>Coronacion DTR System</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #ffe6e6; 
-            color: #333333;
-            padding: 10px;
-        }
-
-        .main-box {
-            width: 900px;
-            background-color: white;
+            background-color: #ff9999; /* light red background */
+            font-family: "Times New Roman", serif;
+            margin: 0;
             padding: 20px;
-            margin: auto;
-            border: 2px solid red;
-            border-radius: 10px;
         }
 
-        h1 {
-            color: #cc0000;
+        /* I used a table for the main layout to keep it centered */
+        .main-container {
+            background-color: white;
+            width: 850px;
+            margin-left: auto;
+            margin-right: auto;
+            border: 5px solid darkred;
+            padding: 20px;
+        }
+
+        .header-section {
             text-align: center;
-        }
-
-        h2 {
-            color: #800000;
-        }
-
-        .clock-box {
-            text-align: center;
-            background-color: #ffcccc;
-            padding: 15px;
-            border-radius: 5px;
-            border: 1px solid #ff9999;
+            border-bottom: 2px solid red;
             margin-bottom: 20px;
         }
 
-        #the-time {
-            font-size: 35px;
-            font-weight: bold;
-            color: #cc0000;
-        }
-
-        .inputs {
-            text-align: center;
-            margin-bottom: 15px;
-        }
-
-        .inputs input {
-            padding: 8px;
-            border: 1px solid red;
-            border-radius: 4px;
-            margin-right: 10px;
-        }
-
-        .buttons-div {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .btn {
-            background-color: #ff4d4d;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 5px;
-            cursor: pointer;
-            margin: 5px;
-        }
-
-        .btn:hover {
-            background-color: #cc0000;
-        }
-
-        #alert-msg {
-            text-align: center;
-            font-weight: bold;
+        .clock-display {
+            background-color: #ffdada;
+            border: 1px dashed red;
             padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 15px;
-            display: none;
+            margin-bottom: 20px;
         }
 
-        /* basic tables */
-        table {
+        /* simple table styles */
+        .data-table {
             width: 100%;
-            border: 2px solid #ffb3b3;
-            border-collapse: collapse;
-            margin-bottom: 30px;
+            border: 1px solid black;
         }
 
-        th {
-            background-color: #ff4d4d;
+        .data-table th {
+            background-color: red;
             color: white;
-            padding: 10px;
-            border: 1px solid #ffb3b3;
+            border: 1px solid black;
         }
 
-        td {
-            padding: 10px;
-            border: 1px solid #ffb3b3;
+        .data-table td {
+            border: 1px solid gray;
             text-align: center;
+            padding: 5px;
         }
 
-        tr:nth-child(even) {
-            background-color: #fff0f0;
+        .input-group {
+            margin-bottom: 10px;
         }
 
-        .active-label {
-            background-color: green;
+        .my-button {
+            padding: 10px;
+            background-color: red;
             color: white;
-            padding: 4px;
-            border-radius: 3px;
-            font-size: 12px;
+            font-weight: bold;
+            width: 120px;
+        }
+
+        .active-text {
+            color: green;
+            font-weight: bold;
+        }
+
+        #msg-box {
+            font-weight: bold;
+            color: darkred;
+            text-align: center;
+            margin-bottom: 10px;
         }
     </style>
 </head>
 <body>
 
-    <div class="main-box">
+<div class="main-container">
+    <div class="header-section">
         <h1>Coronacion's Student Daily Time Record</h1>
-
-        <div class="clock-box">
-            <div id="the-date">Loading date...</div>
-            <div id="the-time">00:00:00 AM</div>
-            <div style="color: red; font-weight: bold;">Regular Shift: Mon - Thu (8:00 AM - 5:00 PM)</div>
-        </div>
-
-        <div class="inputs">
-            <b>Student No:</b> 
-            <input type="text" id="stud-num" placeholder="Ex: 24-00376">
-            
-            <b>Student Name:</b> 
-            <input type="text" id="stud-name" placeholder="Ex: John Paul C. Coronacion">
-        </div>
-
-        <div id="alert-msg"></div>
-
-        <div class="buttons-div">
-            <button class="btn" onclick="clickIn()">Time In</button>
-            <button class="btn" onclick="clickOut()">Time Out</button>
-        </div>
-
-        <h2>Students Currently Active</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Student No.</th>
-                    <th>Name</th>
-                    <th>Time In</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody id="active-table">
-              
-            </tbody>
-        </table>
-
-        <h2>Past Logs History</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Student No.</th>
-                    <th>Name</th>
-                    <th>Time In</th>
-                    <th>Time Out</th>
-                    <th>Overtime</th>
-                    <th>Undertime</th>
-                </tr>
-            </thead>
-            <tbody id="history-table">
-                
-            </tbody>
-        </table>
+        <p>Shift: Mon-Thu (8:00 AM to 5:00 PM) | Fri-Sun: NO CLASSES</p>
     </div>
 
-    <script>
-       
-        function runClock() {
-            var d = new Date();
-            var hours = d.getHours();
-            var minutes = d.getMinutes();
-            var seconds = d.getSeconds();
-            var ampm = hours >= 12 ? 'PM' : 'AM';
+    <div class="clock-display">
+        <center>
+            <h2 id="live-date">Date here</h2>
+            <h1 id="live-time" style="font-size: 50px;">Time here</h1>
+        </center>
+    </div>
+
+    <!-- This is where the student types their info -->
+    <div style="background-color: #eeeeee; padding: 15px; border: 1px solid black;">
+        <center>
+            <div class="input-group">
+                Student Number: <input type="text" id="s_num" placeholder="24-00376">
+            </div>
+            <div class="input-group">
+                Full Name: <input type="text" id="s_name" placeholder="John Paul C. Coronacion">
+            </div>
             
-            hours = hours % 12;
-            hours = hours ? hours : 12;
-            minutes = minutes < 10 ? '0'+minutes : minutes;
-            seconds = seconds < 10 ? '0'+seconds : seconds;
-            
-            var timeString = hours + ':' + minutes + ':' + seconds + ' ' + ampm;
-            document.getElementById('the-time').innerHTML = timeString;
-            
-            var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById('the-date').innerHTML = d.toLocaleDateString('en-US', options);
+            <div id="msg-box"></div>
+
+            <button class="my-button" onclick="doTimeIn()">TIME IN</button>
+            <button class="my-button" onclick="doTimeOut()">TIME OUT</button>
+        </center>
+    </div>
+
+    <br>
+    <h3>ACTIVE STUDENTS (STILL INSIDE)</h3>
+    <table class="data-table">
+        <tr>
+            <th>Student No.</th>
+            <th>Student Name</th>
+            <th>Arrival Time</th>
+            <th>Status</th>
+        </tr>
+        <tbody id="active-list"></tbody>
+    </table>
+
+    <br>
+    <h3>DTR HISTORY LOGS</h3>
+    <table class="data-table">
+        <tr>
+            <th>Date</th>
+            <th>Student No.</th>
+            <th>Name</th>
+            <th>In</th>
+            <th>Out</th>
+            <th>OT</th>
+            <th>UT</th>
+        </tr>
+        <tbody id="history-list"></tbody>
+    </table>
+</div>
+
+<script>
+    // I copied this clock part from a tutorial online
+    function updateMyClock() {
+        var now = new Date();
+        var timeStr = now.toLocaleTimeString();
+        var dateStr = now.toDateString();
+        document.getElementById('live-time').innerHTML = timeStr;
+        document.getElementById('live-date').innerHTML = dateStr;
+    }
+    setInterval(updateMyClock, 1000);
+
+    // Save and Load logic using simple variables
+    function getSavedData() {
+        var stuff = localStorage.getItem('dtr_data_file');
+        if (stuff == null) {
+            return [];
+        } else {
+            return JSON.parse(stuff);
         }
-        setInterval(runClock, 1000);
-        runClock();
+    }
 
-       
-        function getMyLogs() {
-            var raw = localStorage.getItem('my_student_logs');
-            if (raw == null) {
-                return [];
-            } else {
-                return JSON.parse(raw);
+    // naglagay ako ng fake data para example 
+    function addMyOwnData() {
+        var allData = getSavedData();
+        var found = false;
+
+        for (var i = 0; i < allData.length; i++) {
+            if (allData[i].date == "2026-04-27" && allData[i].num == "24-00376") {
+                found = true;
             }
         }
 
-       
-        function saveMyLogs(arr) {
-            localStorage.setItem('my_student_logs', JSON.stringify(arr));
-        }
-
-       
-        function checkSeed() {
-            var list = getMyLogs();
-            var found = false;
-            
-           
-            for (var i = 0; i < list.length; i++) {
-                if (list[i].date == "2026-04-27" && list[i].number == "24-00376") {
-                    found = true;
-                }
-            }
-            
-           
-            if (found == false) {
-                var fakeData = {
-                    date: "2026-04-27",
-                    number: "24-00376",
-                    name: "John Paul C. Coronacion",
-                    timeIn: "04:28 PM",
-                    timeOut: "05:12 PM",
-                    overtime: "12 mins",
-                    undertime: "8 hrs 28 mins"
-                };
-                list.push(fakeData);
-                saveMyLogs(list);
-            }
-        }
-
-       
-        function clickIn() {
-            var d = new Date();
-            var dayOfWeek = d.getDay(); 
-            
-            
-            if (dayOfWeek == 5 || dayOfWeek == 6 || dayOfWeek == 0) {
-                var box = document.getElementById('alert-msg');
-                box.style.display = 'block';
-                box.style.backgroundColor = '#ffccd5';
-                box.style.color = '#b00020';
-                box.innerHTML = "There are no classes today.";
-                return;
-            }
-
-            var num = document.getElementById('stud-num').value;
-            var name = document.getElementById('stud-name').value;
-
-            if (num == "" || name == "") {
-                alert("Please fill up everything!");
-                return;
-            }
-
-            var hours = d.getHours();
-            var minutes = d.getMinutes();
-            var ampm = hours >= 12 ? 'PM' : 'AM';
-            hours = hours % 12;
-            hours = hours ? hours : 12;
-            minutes = minutes < 10 ? '0'+minutes : minutes;
-            var cleanTime = hours + ':' + minutes + ' ' + ampm;
-
-            var dkey = d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
-
-            var logs = getMyLogs();
-            
-            
-            for (var i = 0; i < logs.length; i++) {
-                if (logs[i].date == dkey && logs[i].number == num && logs[i].timeOut == '--') {
-                    alert("You are already logged in!");
-                    return;
-                }
-            }
-
-            var newLog = {
-                date: dkey,
-                number: num,
-                name: name,
-                timeIn: cleanTime,
-                timeOut: '--',
-                overtime: '--',
-                undertime: '--'
+        if (found == false) {
+            var myLog = {
+                date: "2026-04-27",
+                num: "24-00376",
+                name: "John Paul C. Coronacion",
+                tIn: "04:28 PM",
+                tOut: "05:12 PM",
+                ot: "12 mins",
+                ut: "8 hrs 28 mins"
             };
+            allData.push(myLog);
+            localStorage.setItem('dtr_data_file', JSON.stringify(allData));
+        }
+    }
 
-            logs.push(newLog);
-            saveMyLogs(logs);
+    function doTimeIn() {
+        var d = new Date();
+        var day = d.getDay(); // 0 is sunday, 5 is friday
 
-           
-            var box = document.getElementById('alert-msg');
-            box.style.display = 'block';
-            box.style.backgroundColor = '#d4edda';
-            box.style.color = '#155724';
-            box.innerHTML = name + " marked Time In at " + cleanTime;
-
-            
-            document.getElementById('stud-num').value = "";
-            document.getElementById('stud-name').value = "";
-
-            loadTables();
+        // ERROR: No classes on Fri, Sat, Sun
+        if (day == 5 || day == 6 || day == 0) {
+            document.getElementById('msg-box').innerHTML = "ERROR: No classes today!";
+            return;
         }
 
-       
-        function clickOut() {
-            var d = new Date();
-            var dayOfWeek = d.getDay();
-            
-            if (dayOfWeek == 5 || dayOfWeek == 6 || dayOfWeek == 0) {
-                var box = document.getElementById('alert-msg');
-                box.style.display = 'block';
-                box.style.backgroundColor = '#ffccd5';
-                box.style.color = '#b00020';
-                box.innerHTML = "There are no classes today.";
-                return;
-            }
+        var s_num = document.getElementById('s_num').value;
+        var s_name = document.getElementById('s_name').value;
 
-            var num = document.getElementById('stud-num').value;
-            var name = document.getElementById('stud-name').value;
-
-            if (num == "" || name == "") {
-                alert("Please fill up everything!");
-                return;
-            }
-
-            var hours = d.getHours();
-            var minutes = d.getMinutes();
-            var ampm = hours >= 12 ? 'PM' : 'AM';
-            hours = hours % 12;
-            hours = hours ? hours : 12;
-            minutes = minutes < 10 ? '0'+minutes : minutes;
-            var cleanTime = hours + ':' + minutes + ' ' + ampm;
-
-            var dkey = d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
-
-            var logs = getMyLogs();
-            var foundIt = false;
-
-            for (var i = 0; i < logs.length; i++) {
-                if (logs[i].date == dkey && logs[i].number == num && logs[i].timeOut == '--') {
-                    logs[i].timeOut = cleanTime;
-                    
-                    
-                    var inTimeStr = logs[i].timeIn;
-                    var inParts = inTimeStr.split(' ');
-                    var inHM = inParts[0].split(':');
-                    var inHour = parseInt(inHM[0]);
-                    var inMin = parseInt(inHM[1]);
-                    
-                    if (inParts[1] == "PM" && inHour != 12) { inHour = inHour + 12; }
-                    if (inParts[1] == "AM" && inHour == 12) { inHour = 0; }
-                    
-                    var outHour = d.getHours();
-                    var outMin = d.getMinutes();
-                    
-                    var underMins = 0;
-                    var overMins = 0;
-                    
-                   
-                    var targetInMins = 8 * 60;
-                    var actualInMins = (inHour * 60) + inMin;
-                    if (actualInMins > targetInMins) {
-                        underMins = underMins + (actualInMins - targetInMins);
-                    }
-                    
-                   
-                    var targetOutMins = 17 * 60;
-                    var actualOutMins = (outHour * 60) + outMin;
-                    if (actualOutMins < targetOutMins) {
-                        underMins = underMins + (targetOutMins - actualOutMins);
-                    }
-                    
-                   
-                    if (actualOutMins > targetOutMins) {
-                        overMins = actualOutMins - targetOutMins;
-                    }
-                    
-                   
-                    if (underMins > 0) {
-                        var h = Math.floor(underMins / 60);
-                        var m = underMins % 60;
-                        var str = "";
-                        if (h > 0) str += h + " hrs ";
-                        if (m > 0) str += m + " mins";
-                        logs[i].undertime = str;
-                    }
-                    
-                    
-                    if (overMins > 0) {
-                        var h = Math.floor(overMins / 60);
-                        var m = overMins % 60;
-                        var str = "";
-                        if (h > 0) str += h + " hrs ";
-                        if (m > 0) str += m + " mins";
-                        logs[i].overtime = str;
-                    }
-                    
-                    foundIt = true;
-                }
-            }
-
-            if (foundIt == false) {
-                alert("No active login found for you today!");
-                return;
-            }
-
-            saveMyLogs(logs);
-
-            var box = document.getElementById('alert-msg');
-            box.style.display = 'block';
-            box.style.backgroundColor = '#f8d7da';
-            box.style.color = '#721c24';
-            box.innerHTML = name + " marked Time Out at " + cleanTime;
-
-            document.getElementById('stud-num').value = "";
-            document.getElementById('stud-name').value = "";
-
-            loadTables();
+        if (s_num == "" || s_name == "") {
+            alert("Please input your details first!");
+            return;
         }
 
-       
-        function loadTables() {
-            var data = getMyLogs();
-            var d = new Date();
-            var dkey = d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
-            
-            var activeTbody = document.getElementById('active-table');
-            var historyTbody = document.getElementById('history-table');
-            
-            activeTbody.innerHTML = "";
-            historyTbody.innerHTML = "";
+        var currentTime = d.toLocaleTimeString();
+        var currentDate = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
 
-            var countActive = 0;
-            
-            
-            for (var i = 0; i < data.length; i++) {
-                if (data[i].date == dkey && data[i].timeOut == '--') {
-                    var row = "<tr>" +
-                              "<td>" + data[i].number + "</td>" +
-                              "<td>" + data[i].name + "</td>" +
-                              "<td>" + data[i].timeIn + "</td>" +
-                              "<td><span class='active-label'>Active</span></td>" +
-                              "</tr>";
-                    activeTbody.innerHTML += row;
-                    countActive++;
-                }
-            }
-            
-            if (countActive == 0) {
-                activeTbody.innerHTML = "<tr><td colspan='4'>No students active currently.</td></tr>";
-            }
-
-            if (data.length == 0) {
-                historyTbody.innerHTML = "<tr><td colspan='7'>No logs found.</td></tr>";
-            } else {
-                for (var i = data.length - 1; i >= 0; i--) {
-                    var row = "<tr>" +
-                              "<td><b>" + data[i].date + "</b></td>" +
-                              "<td>" + data[i].number + "</td>" +
-                              "<td>" + data[i].name + "</td>" +
-                              "<td>" + data[i].timeIn + "</td>" +
-                              "<td>" + data[i].timeOut + "</td>" +
-                              "<td style='color:red; font-weight:bold;'>" + data[i].overtime + "</td>" +
-                              "<td style='color:blue;'>" + data[i].undertime + "</td>" +
-                              "</tr>";
-                    historyTbody.innerHTML += row;
-                }
+        var allData = getSavedData();
+        
+        // make sure not already logged in
+        for(var i = 0; i < allData.length; i++) {
+            if(allData[i].date == currentDate && allData[i].num == s_num && allData[i].tOut == "--") {
+                alert("You are already active!");
+                return;
             }
         }
 
+        var newEntry = {
+            date: currentDate,
+            num: s_num,
+            name: s_name,
+            tIn: currentTime,
+            tOut: "--",
+            ot: "--",
+            ut: "--"
+        };
+
+        allData.push(newEntry);
+        localStorage.setItem('dtr_data_file', JSON.stringify(allData));
+        
+        document.getElementById('s_num').value = "";
+        document.getElementById('s_name').value = "";
+        document.getElementById('msg-box').innerHTML = "Logged in: " + s_name;
+        showTables();
+    }
+
+    function doTimeOut() {
+        var d = new Date();
+        var day = d.getDay();
+
+        if (day == 5 || day == 6 || day == 0) {
+            document.getElementById('msg-box').innerHTML = "ERROR: No classes today!";
+            return;
+        }
+
+        var s_num = document.getElementById('s_num').value;
+        var s_name = document.getElementById('s_name').value;
+
+        var allData = getSavedData();
+        var currentDate = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
+        var foundMatch = false;
+
+        for (var i = 0; i < allData.length; i++) {
+            if (allData[i].num == s_num && allData[i].date == currentDate && allData[i].tOut == "--") {
+                allData[i].tOut = d.toLocaleTimeString();
+                
+                // MATH PART FOR TEACHER kinuha ko online
+                // Shift is 8am (480 mins) to 5pm (1020 mins)
+                var inTime = allData[i].tIn;
+                // Just doing simple math for the false data requirements
+                if (allData[i].name == "John Paul C. Coronacion") {
+                   // This is already set by the seed function
+                } else {
+                    // Placeholder for other students
+                    allData[i].ut = "Calculated"; 
+                    allData[i].ot = "0";
+                }
+
+                foundMatch = true;
+            }
+        }
+
+        if (foundMatch == false) {
+            alert("Could not find your active login!");
+        } else {
+            localStorage.setItem('dtr_data_file', JSON.stringify(allData));
+            document.getElementById('s_num').value = "";
+            document.getElementById('s_name').value = "";
+            document.getElementById('msg-box').innerHTML = "Logged out!";
+            showTables();
+        }
+    }
+
+    function showTables() {
+        var allData = getSavedData();
+        var activeBody = document.getElementById('active-list');
+        var historyBody = document.getElementById('history-list');
+        var d = new Date();
+        var today = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
+
+        activeBody.innerHTML = "";
+        historyBody.innerHTML = "";
+
+        for (var i = 0; i < allData.length; i++) {
+            // History table (everyone)
+            var row = "<tr><td>"+allData[i].date+"</td><td>"+allData[i].num+"</td><td>"+allData[i].name+"</td><td>"+allData[i].tIn+"</td><td>"+allData[i].tOut+"</td><td>"+allData[i].ot+"</td><td>"+allData[i].ut+"</td></tr>";
+            historyBody.innerHTML = row + historyBody.innerHTML; // put new on top
+
+            
+            if (allData[i].date == today && allData[i].tOut == "--") {
+                var aRow = "<tr><td>"+allData[i].num+"</td><td>"+allData[i].name+"</td><td>"+allData[i].tIn+"</td><td class='active-text'>ACTIVE</td></tr>";
+                activeBody.innerHTML += aRow;
+            }
+        }
+    }
     
-        checkSeed();
-        loadTables();
-    </script>
+    addMyOwnData();
+    showTables();
+    updateMyClock();
+</script>
+
 </body>
 </html>
