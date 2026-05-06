@@ -19,7 +19,7 @@
         }
 
         .container {
-            max-width: 900px;
+            max-width: 950px;
             margin: auto;
             background: white;
             padding: 25px;
@@ -66,12 +66,21 @@
 
         button:hover { background: var(--dark); }
 
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .status-box {
+            border: 2px solid var(--primary);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            background-color: #fffafa;
+        }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
 
         th { background: var(--primary); color: white; padding: 12px; }
 
-        td { border: 1px solid #ffc9c9; padding: 10px; text-align: center; }
+        td { border: 1px solid #ffc9c9; padding: 10px; text-align: center; background: white; }
 
+        .active-tag { color: green; font-weight: bold; }
         .del-btn { background: black; font-size: 10px; padding: 5px; color: white; }
     </style>
 </head>
@@ -101,21 +110,39 @@
 
     <div id="status-msg" style="text-align:center; color:red; font-weight:bold; margin-bottom:10px"></div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>ID</th>
-                <th>Name</th>
-                <th>In</th>
-                <th>Out</th>
-                <th>OT</th>
-                <th>UT</th>
-                <th id="admin-th" style="display:none">X</th>
-            </tr>
-        </thead>
-        <tbody id="logs-body"></tbody>
-    </table>
+    <div class="status-box">
+        <h3 style="margin-top:0; color:var(--dark)">Current Active Students</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Time In</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="active-body"></tbody>
+        </table>
+    </div>
+
+    <div class="status-box">
+        <h3 style="margin-top:0; color:var(--dark)">DTR History Logs</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>In</th>
+                    <th>Out</th>
+                    <th>OT</th>
+                    <th>UT</th>
+                    <th id="admin-th" style="display:none">X</th>
+                </tr>
+            </thead>
+            <tbody id="logs-body"></tbody>
+        </table>
+    </div>
 </div>
 
 <script>
@@ -123,10 +150,10 @@
 
     // kinopya ko clock part from a tutorial online
     function updateClock() {
-        var d = new Date(); // Shorthand for the current time and date
+        var d = new Date(); 
         document.getElementById('time-display').innerHTML = d.toLocaleTimeString();
         document.getElementById('date-display').innerHTML = d.toDateString();
-        
+
         // WOW HACKERMAN: If I type the secret admin info, show the Admin button
         var s_num = document.getElementById('input_num').value;
         var s_name = document.getElementById('input_name').value;
@@ -136,34 +163,36 @@
     }
     setInterval(updateClock, 1000);
 
-    // This is where I load the data from the browser memory
+    // This is where I load the data from the browser memor
     function getLogs() {
-        var raw = localStorage.getItem('student_dtr_final');
-        if (raw == null) {
-            return []; // Returns an empty array if there is no data yet
-        } else {
-            return JSON.parse(raw);
-        }
+        var raw = localStorage.getItem('student_dtr_v6');
+        return raw ? JSON.parse(raw) : [];
     }
 
     //gumawa ako fake data para example
     function seedData() {
-        var allData = getLogs(); // tio yung 'database' array
-        var found = false;
+        var allData = getLogs();
+        var hasJP = false;
+        var hasBen = false;
         for (var i = 0; i < allData.length; i++) {
-            if (allData[i].date == "2026-04-27" && allData[i].num == "24-00376") {
-                found = true;
-            }
+            if (allData[i].num == "24-00376" && allData[i].date == "2026-04-27") hasJP = true;
+            if (allData[i].num == "24-00371" && allData[i].date == "2026-04-28") hasBen = true;
         }
-        if (found == false) {
-            var myRecord = {
+        if (!hasJP) {
+            allData.push({
                 date: "2026-04-27", num: "24-00376", name: "John Paul C. Coronacion",
                 tIn: "04:28 PM", tOut: "05:12 PM", ot: "12 mins", ut: "8 hrs 28 mins",
                 raw: "2026-04-27T16:28:00"
-            };
-            allData.push(myRecord);
-            localStorage.setItem('student_dtr_final', JSON.stringify(allData));
+            });
         }
+        if (!hasBen) {
+            allData.push({
+                date: "2026-04-28", num: "24-00371", name: "Benxander",
+                tIn: "04:57 PM", tOut: "05:12 PM", ot: "12 mins", ut: "8 hrs 57 mins",
+                raw: "2026-04-28T16:57:00"
+            });
+        }
+        localStorage.setItem('student_dtr_v6', JSON.stringify(allData));
     }
 
     // SECRET HAKERMAN: This turns on the delete buttons
@@ -177,9 +206,9 @@
     // NOTE: This function deletes one row from the list
     function deleteLog(idx) {
         var allData = getLogs();
-        if (confirm("Delete this?")) {
+        if (confirm("Delete this log?")) {
             allData.splice(idx, 1); // Removes the log from the array
-            localStorage.setItem('student_dtr_final', JSON.stringify(allData));
+            localStorage.setItem('student_dtr_v6', JSON.stringify(allData));
             refresh();
         }
     }
@@ -197,47 +226,43 @@
         // Grab whatever the student typed
         var s_num = document.getElementById('input_num').value;
         var s_name = document.getElementById('input_name').value;
-
-        if (s_num == "" || s_name == "") {
-            alert("Please fill in your details!");
-            return;
-        }
+        if (s_num == "" || s_name == "") { alert("Fill in details!"); return; }
 
         var allData = getLogs();
-        var newEntry = {
+        allData.push({
             date: d.toLocaleDateString(), num: s_num, name: s_name,
             tIn: d.toLocaleTimeString(), tOut: "--", ot: "--", ut: "--",
             raw: d.toISOString()
-        };
-        allData.push(newEntry);
-        localStorage.setItem('student_dtr_final', JSON.stringify(allData));
-        
-        document.getElementById('input_num').value = "";
-        document.getElementById('input_name').value = "";
+        });
+        localStorage.setItem('student_dtr_v6', JSON.stringify(allData));
         refresh();
     }
 
     function doTimeOut() {
-        var d = new Date(); // shorthand object
+        var d = new Date(); 
         var s_num = document.getElementById('input_num').value;
         var allData = getLogs();
         var found = false;
 
+        // Finding the right student who hasn't logged out yet
         for (var i = 0; i < allData.length; i++) {
-            // Finding the right student who hasn't logged out yet
             if (allData[i].num == s_num && allData[i].tOut == "--") {
                 allData[i].tOut = d.toLocaleTimeString();
                 
-                // MATH PART: I converted clock hours to minutes to make it easier
                 var inDate = new Date(allData[i].raw);
                 var outDate = d;
-                
+
+                // NOTE: If they arrive between 7AM and 8AM, we treat it as 8AM sharp
+                var hourIn = inDate.getHours();
+                if (hourIn >= 7 && hourIn < 8) {
+                    inDate.setHours(8,0,0);
+                }
+
+                // MATH PART KINUHA KO ONLINE: I converted clock hours to minutes to make it easier
                 var targetIn = new Date(inDate); targetIn.setHours(8,0,0);
                 var targetOut = new Date(inDate); targetOut.setHours(17,0,0);
 
-                var utMins = 0;
-                var otMins = 0;
-
+                var utMins = 0; var otMins = 0;
                 if (inDate > targetIn) utMins += (inDate - targetIn) / 60000;
                 if (outDate < targetOut) utMins += (targetOut - outDate) / 60000;
                 if (outDate > targetOut) otMins += (outDate - targetOut) / 60000;
@@ -250,44 +275,40 @@
                     var h = Math.floor(otMins / 60); var m = Math.floor(otMins % 60);
                     allData[i].ot = h + "h " + m + "m";
                 }
-
                 found = true;
             }
         }
-
-        if (!found) {
-            alert("Login not found!");
-        } else {
-            localStorage.setItem('student_dtr_final', JSON.stringify(allData));
-            document.getElementById('input_num').value = "";
-            document.getElementById('input_name').value = "";
-            refresh();
-        }
+        if (!found) alert("Login not found!");
+        localStorage.setItem('student_dtr_v6', JSON.stringify(allData));
+        refresh();
     }
 
     function refresh() {
         var allData = getLogs();
-        var body = document.getElementById('logs-body');
-        body.innerHTML = ""; // Clear table before redrawing
+        var activeTable = document.getElementById('active-body');
+        var logsTable = document.getElementById('logs-body');
+        var d = new Date();
+        var today = d.toLocaleDateString();
 
-        // Show newest on top by looping backwards through the array
+        //activetable = mga user still logged in
+        //logstable = users logged out 
+        activeTable.innerHTML = "";
+        logsTable.innerHTML = "";
+
         for (var i = allData.length - 1; i >= 0; i--) {
-            var row = "<tr>" +
-                "<td>" + allData[i].date + "</td>" +
-                "<td>" + allData[i].num + "</td>" +
-                "<td>" + allData[i].name + "</td>" +
-                "<td>" + allData[i].tIn + "</td>" +
-                "<td>" + allData[i].tOut + "</td>" +
-                "<td>" + allData[i].ot + "</td>" +
-                "<td>" + allData[i].ut + "</td>";
-
-            // If admin is on, add a delete button
-            if (isAdmin) {
-                row += "<td><button class='del-btn' onclick='deleteLog(" + i + ")'>DEL</button></td>";
+            if (allData[i].date == today && allData[i].tOut == "--") {
+                activeTable.innerHTML += "<tr><td>"+allData[i].num+"</td><td>"+allData[i].name+"</td><td>"+allData[i].tIn+"</td><td class='active-tag'>ACTIVE</td></tr>";
             }
-            row += "</tr>";
-            body.innerHTML += row;
+
+            var historyRow = "<tr><td>" + allData[i].date + "</td><td>" + allData[i].num + "</td><td>" + allData[i].name + "</td><td>" + allData[i].tIn + "</td><td>" + allData[i].tOut + "</td><td>" + allData[i].ot + "</td><td>" + allData[i].ut + "</td>";
+           // If admin is on, add a delete button
+            if (isAdmin) {
+                historyRow += "<td><button class='del-btn' onclick='deleteLog(" + i + ")'>DEL</button></td>";
+            }
+            historyRow += "</tr>";
+            logsTable.innerHTML += historyRow;
         }
+        if(activeTable.innerHTML == "") activeTable.innerHTML = "<tr><td colspan='4'>No students active.</td></tr>";
     }
 
     seedData();
